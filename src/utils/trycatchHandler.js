@@ -1,0 +1,3 @@
+const trycatchHandler  = async (fn) => {
+
+}
