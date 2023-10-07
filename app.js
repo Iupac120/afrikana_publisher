@@ -12,11 +12,13 @@ const corsOptions = {Credential: true, origin: process.env.URL || '*'}
 app.use(cors(corsOptions))
 app.use(express.static('public'))
 import {router as userRoute} from "./src/routes/userRouter.js"
+import {router as authRoute} from "./src/routes/authRoute.js"
 
 
 const port = process.env.PORT || 5000
 app.use(cookieParser())
 app.use("/api/v1/user", userRoute)
+app.use("/api/v1/auth", authRoute)
 app.listen(port, () => {
     console.log(`app is listening to port ${port}`)
 })
