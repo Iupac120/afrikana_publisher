@@ -5,4 +5,4 @@ router.post("/login", authController.userLogin)
 router.post("/refresh", authController.refreshLogin)
 router.post("/logout", authController.logout)
 
-export default router
+export  {router}

@@ -1,7 +1,7 @@
 import express from "express";
 import bcrypt from "bcrypt";
-import pool from "../database/db";
-import { jwtToken } from "../utils/jwt";
+import pool from "../database/db.js";
+import { jwtToken } from "../utils/jwt.js";
 
 const userLogin = async(req,res) => {
     try {

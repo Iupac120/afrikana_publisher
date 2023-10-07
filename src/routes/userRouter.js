@@ -6,4 +6,4 @@ import { authenticateToken } from "../middleware/authorization.js"
 router.get("/users",authenticateToken, userController.getUser)
 router.post("/",userController.createUser)
 
-export default router
+export {router}
