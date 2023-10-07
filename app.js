@@ -4,16 +4,31 @@ dotenv.config()
 const app = express()
 import cookieParser from "cookie-parser"
 import cors from "cors"
+import passport from "passport";
+import "./src/utils/passport.js"
+import cookieSession from "cookie-session";
 import {dirname, join} from "path"
 import { fileURLToPath } from "url"
-const _dirname  = dirname(fileURLToPath(import.meta.url))
-app.use(express.json())
-const corsOptions = {Credential: true, origin: process.env.URL || '*'}
-app.use(cors(corsOptions))
-app.use(express.static('public'))
 import {router as userRoute} from "./src/routes/userRouter.js"
 import {router as authRoute} from "./src/routes/authRoute.js"
-
+const _dirname  = dirname(fileURLToPath(import.meta.url))
+app.use(express.json())
+const corsOptions = {
+    Credential: true, 
+    origin: process.env.CLIENT_URL || '*',
+    methods:"GET,POST,PUT,DELETE"
+    }
+app.use(cors(corsOptions))
+app.use(express.static('public'))
+app.use(
+    cookieSession({
+        name:"session",
+        keys:["passanta69"],
+        maxAge:24*60*60*1000
+    })
+)
+app.use(passport.initialize())
+app.use(passport.session())
 
 const port = process.env.PORT || 5000
 app.use(cookieParser())

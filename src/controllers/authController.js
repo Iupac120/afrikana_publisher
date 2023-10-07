@@ -2,6 +2,8 @@ import express from "express";
 import bcrypt from "bcrypt";
 import pool from "../database/db.js";
 import { jwtToken } from "../utils/jwt.js";
+import passport from "passport";
+
 
 const userLogin = async(req,res) => {
     try {
@@ -41,6 +43,10 @@ const logout = async (req,res) => {
     } catch (error) {
         res.status(500).json(err.message)
     }
+}
+
+const googleLogin = function (){
+    passport.authenticate("google")
 }
 
 export default {
