@@ -46,11 +46,29 @@ const logout = async (req,res) => {
 }
 
 const googleLogin = function (){
-    passport.authenticate("google")
+    passport.authenticate("google",{
+        successRedirect:process.env.CLIENT_URL,
+        failureRedirect:"/login/failed"
+    })
+}
+const facebookLogin =  function (){
+    passport.authenticate("facebook",{
+        successRedirect:process.env.CLIENT_URL,
+        failureRedirect:"/login/failed"
+    })
+}
+
+const loginFailure = (req,res) => {
+    res.status(401).json({
+        error:true,
+        message:"login failure"
+    })
 }
 
 export default {
     userLogin,
     refreshLogin,
-    logout
+    logout,
+    googleLogin,
+    loginFailure
 }
