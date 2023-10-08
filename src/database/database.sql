@@ -8,7 +8,8 @@ CREATE TABLE users (
     user_email TEXT NOT NULL UNIQUE,
     user_password TEXT NOT NULL,
     google_id TEXT,
-    provider VAR (100),
+    facebook_id TEXT,
+    social_provider VARCHAR (100),
     created_at DATE NOT NULL,
     updated_at DATE NOT NULL,
 );
