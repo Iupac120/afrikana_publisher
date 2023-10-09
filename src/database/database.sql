@@ -9,10 +9,11 @@ CREATE TABLE users (
     user_password TEXT NOT NULL,
     first_name VARCHAR (50),
     last_name VARCHAR (50),
-    profile_image TEXT,
+    photo_id BIGINT REFERENCES profile_image(image_id),
     google_id TEXT,
     facebook_id TEXT,
     social_provider VARCHAR (100),
+    display_mode BOOLEAN DEFAULT TRUE,
     created_at DATE NOT NULL,
     updated_at DATE NOT NULL,
 );
@@ -20,7 +21,9 @@ CREATE TABLE users (
 CREATE TABLE profile_image (
     image_id SERIAL PRIMARY KEY,
     public_id TEXT,
-    image_url TEXT
+    image_url TEXT,
+    created_at DATE,
+    updated_at DATE
 );
 
 INSERT INTO users (user_name,user_email,user_password) VALUES ("okpara", "oforokpara@gmail.com","okpara");

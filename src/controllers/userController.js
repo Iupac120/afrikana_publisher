@@ -43,7 +43,11 @@ const updateImage = async (req,res) => {
 const updateProfileName = async (req,res) => {
     const {firstName, lastName} = req.body
     const userId = req.user.id
-    await pool.query("UPDATE users SET first_name = $1, last_name = $2 WHERE user_id = $3",[firstName,lastName,userId])
+   const names = await pool.query("UPDATE users SET first_name = $1, last_name = $2, updated_at = $3 WHERE user_id = $4",[firstName,lastName,Date.now(),userId])
+   if(!names.rows.length){
+    return res.status(500).json("Failed to update")
+   }
+    res.status(201).json({sucees: true, data:names.rows[0]})
 }
 
 const uploadProfileImage = async (req,res) => {
@@ -58,21 +62,25 @@ const uploadProfileImage = async (req,res) => {
             console.log(err)
             return res.status(500).json({
                 success: false,
-                message:"Errior"
+                message:"Error"
             })
         }
-        await pool.query("UPDATE users SET profile_image = $1 WHERE user_id = $2",[result, userId])
+        const public_id = result.public_id
+        const image_url = result.url
+        const imageId = await pool.query("INSERT INTO profile_image (public_id,image_url,created_at,updated_at) VALUES ($1,$2,$3,$4) RETURNING image_id",[public_id,image_url,Date.now(),Date.now()])
+        comsole.log(imageId)
+        const userProfile = await pool.query("UPDATE users SET photo_id = $1,updated_at =$2 WHERE user_id =$3",[imageId,Date.now(),userId])
         res.status(200).json({
             success: true,
             message:"uploaded",
-            data: result
+            data: userProfile
         })
     })
 } 
 
 const getUserProfileImage = async (req,res) => {
     const userId = req.user.id
-    const profileImage = await pool.query("SELECT profile_image FROM users WHERE user_id = $1",[userId])
+    const profileImage = await pool.query("SELECT profile_image.image_url FROM profile_image LEFT JOIN users ON profile_image = users.photo_id WHERE users.user_id = $1",[userId])
     if(!profileImage.rows.length){
         return res.status(500).json("update failed")
     }
@@ -81,6 +89,14 @@ const getUserProfileImage = async (req,res) => {
         data:profileImage.rows[0]
     })
 }
+const displayModeToggle = async (req,res) => {
+    const userId = req.user.id
+    const toggleDisplay = await pool.query("SELECT user_id,user_name,user_first_name,last_name,image_url FROM users LEFT JOIN profile_image ON users.photo_id = profile_image.image_id WHERE user_id = $1 AND display_mode = TRUE",[userId])
+    if(!toggleDisplay.rows.length){
+        res.status()
+    }
+}
+
 
 export default {
     createUser,
