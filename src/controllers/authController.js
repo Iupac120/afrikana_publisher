@@ -70,5 +70,6 @@ export default {
     refreshLogin,
     logout,
     googleLogin,
+    facebookLogin,
     loginFailure
 }
