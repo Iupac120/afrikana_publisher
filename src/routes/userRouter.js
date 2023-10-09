@@ -9,5 +9,7 @@ router.post("/",userController.createUser)
 router.post("/profile",authenticateUser,userController.updateProfileName)
 router.post("/avatar",authenticateUser,upload.single('image'),userController.uploadProfileImage)
 router.get("/avatar",authenticateUser,userController.getUserProfileImage)
+router.put("/display-mode",authenticateUser,userController.displayModeToggle)
+router.put("/password",authenticateUser,userController.updateUserPassword)
 
 export {router}

@@ -1,4 +1,4 @@
-import express from "express";
+import express, { query } from "express";
 import bcrypt from "bcrypt";
 import pool from "../database/db.js"
 import cloudinary from "../utils/cloudinary.js";
@@ -93,15 +93,33 @@ const displayModeToggle = async (req,res) => {
     const userId = req.user.id
     const toggleDisplay = await pool.query("SELECT user_id,user_name,user_first_name,last_name,image_url FROM users LEFT JOIN profile_image ON users.photo_id = profile_image.image_id WHERE user_id = $1 AND display_mode = TRUE",[userId])
     if(!toggleDisplay.rows.length){
-        res.status()
+        await pool.query("SELECT user_name FROM users WHERE user_id = $1"[userId])
     }
+    res.status(201).json({
+        siucces: true,
+        data:toggleDisplay
+    })
 }
-
+const updateUserPassword = async (req,res) => {
+    const userId = req.user.id
+    const userPass = await pool.query("SELECT user_password FROM users WHERE user_id = $1",[userId])
+    if(!userPass.rows.length) return res.status(500).json("Failed to get user pass")
+    const userPassNo = userPass.rows[0]
+    const {password, newPassword} = req.body
+    const isMatch = await bcrypt.compare(userPassNo,password)
+    if(!isMatch) return res.status(500).json("Password does not match")
+    const hashedPassword = await bcrypt.hash(newPassword,10)
+    const updateUserPass = await query.pool("UPDATE users SET user_password = $1 WHERE user_id = $2",[hashedPassword,userId])
+    if(!updateUserPass.rows.length) return res.status(500).json("Failed to update user")
+    return res.status(200).json("User updated successfully")
+}
 
 export default {
     createUser,
     getUser,
     uploadProfileImage,
     updateProfileName,
-    getUserProfileImage
+    getUserProfileImage,
+    displayModeToggle,
+    updateUserPassword
 }
