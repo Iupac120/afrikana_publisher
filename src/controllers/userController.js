@@ -23,23 +23,6 @@ const createUser = async (req,res) => {
 
 }
 
-const updateImage = async (req,res) => {
-    let sampleFile;
-    let uploadPath;
-    if(!req.files || Object.keys(req.files).length === 0){
-        return res.status(400).json("No file to upload")
-    }
-
-    sampleFile = req.files.sampleFile
-    uploadPath = __dirname + "/upload" + sampleFile.name;
-
-    sampleFile.mv(uploadPath , async function (err){
-        if(err) return res.status(401).json("upload faile")
-        await pool.query("UPDATE users SET profile_image = $1 WHERE user_id =$2",[sampleFile.name,])
-        res.send("upload successful")
-    })
-}
-
 const updateProfileName = async (req,res) => {
     const {firstName, lastName} = req.body
     const userId = req.user.id
@@ -67,9 +50,9 @@ const uploadProfileImage = async (req,res) => {
         }
         const public_id = result.public_id
         const image_url = result.url
-        const imageId = await pool.query("INSERT INTO profile_image (public_id,image_url,created_at,updated_at) VALUES ($1,$2,$3,$4) RETURNING image_id",[public_id,image_url,Date.now(),Date.now()])
+        const imageId = await pool.query("INSERT INTO profile_image (public_id,image_url) VALUES ($1,$2) WHERE user_id = $3",[public_id,image_url,userId])
         comsole.log(imageId)
-        const userProfile = await pool.query("UPDATE users SET photo_id = $1,updated_at =$2 WHERE user_id =$3",[imageId,Date.now(),userId])
+        const userProfile = await pool.query("SELECT image_url FROM profile_image WHERE user_id =$1",[userId])
         res.status(200).json({
             success: true,
             message:"uploaded",
@@ -114,6 +97,20 @@ const updateUserPassword = async (req,res) => {
     return res.status(200).json("User updated successfully")
 }
 
+
+const updateUserEmail = async (req,res) => {
+    const userId = req.user.id
+    const userEmail = await pool.query("SELECT user_email FROM users WHERE user_id = $1",[userId])
+    if(!userEmail.rows.length) return res.status(500).json("Failed to get user pass")
+    const userEmailNo = userPass.rows[0]
+    const {newEmail} = req.body
+    const isMatch = await bcrypt.compare(newEmail,userEmailNo)
+    if(!isMatch) return res.status(500).json("Email does not match")
+    const updateUserPass = await query.pool("UPDATE users SET user_email = $1, updated_at = $2 WHERE user_id = $3",[newEmail,Date.now(),userId])
+    if(!updateUserPass.rows.length) return res.status(500).json("Failed to update user")
+    return res.status(200).json("User updated successfully")
+}
+
 export default {
     createUser,
     getUser,
@@ -121,5 +118,6 @@ export default {
     updateProfileName,
     getUserProfileImage,
     displayModeToggle,
-    updateUserPassword
+    updateUserPassword,
+    updateUserEmail
 }

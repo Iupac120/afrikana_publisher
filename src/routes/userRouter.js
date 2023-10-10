@@ -11,5 +11,6 @@ router.post("/avatar",authenticateUser,upload.single('image'),userController.upl
 router.get("/avatar",authenticateUser,userController.getUserProfileImage)
 router.put("/display-mode",authenticateUser,userController.displayModeToggle)
 router.put("/password",authenticateUser,userController.updateUserPassword)
+router.put("/email-preference",authenticateUser,userController.updateUserEmail)
 
 export {router}
