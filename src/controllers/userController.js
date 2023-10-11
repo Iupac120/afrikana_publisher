@@ -23,6 +23,8 @@ const createUser = async (req,res) => {
 
 }
 
+//profile creation
+
 const updateProfileName = async (req,res) => {
     const {firstName, lastName} = req.body
     const userId = req.user.id
@@ -63,7 +65,7 @@ const uploadProfileImage = async (req,res) => {
 
 const getUserProfileImage = async (req,res) => {
     const userId = req.user.id
-    const profileImage = await pool.query("SELECT profile_image.image_url FROM profile_image LEFT JOIN users ON profile_image = users.photo_id WHERE users.user_id = $1",[userId])
+    const profileImage = await pool.query("SELECT profile_image.image_url FROM profile_image WHERE users.user_id = $1",[userId])
     if(!profileImage.rows.length){
         return res.status(500).json("update failed")
     }
@@ -74,7 +76,7 @@ const getUserProfileImage = async (req,res) => {
 }
 const displayModeToggle = async (req,res) => {
     const userId = req.user.id
-    const toggleDisplay = await pool.query("SELECT user_id,user_name,user_first_name,last_name,image_url FROM users LEFT JOIN profile_image ON users.photo_id = profile_image.image_id WHERE user_id = $1 AND display_mode = TRUE",[userId])
+    const toggleDisplay = await pool.query("SELECT users.user_id,users.user_name,users.first_name,users.last_name,profile_image_image_url FROM users LEFT JOIN profile_image ON users.user_id = profile_image.user_id WHERE user_id = $1 AND display_mode = TRUE",[userId])
     if(!toggleDisplay.rows.length){
         await pool.query("SELECT user_name FROM users WHERE user_id = $1"[userId])
     }
@@ -83,6 +85,9 @@ const displayModeToggle = async (req,res) => {
         data:toggleDisplay
     })
 }
+
+//account setting
+
 const updateUserPassword = async (req,res) => {
     const userId = req.user.id
     const userPass = await pool.query("SELECT user_password FROM users WHERE user_id = $1",[userId])
@@ -111,6 +116,45 @@ const updateUserEmail = async (req,res) => {
     return res.status(200).json("User updated successfully")
 }
 
+//artist dashboard
+const createEarning = async (req,res) => {
+    const userId = req.user.id;
+    const {amount} = req.body
+    const earnDate = Date.now()
+    const earn = await pool.query("INSERT INTO user_earning (earning_amount,earning_date) VALUES ($1,$2) WHERE user_id = $3 RETURNING )*",[amount,earnDate,userId])
+    if(!earn.rows.length) return res.status(500).json("Failed to add earning")
+    res.status(201).json({
+        success: true,
+        data: earn
+    })
+}
+
+const getEarning = async (req,res) => {
+    const userId = req.body.id
+    const earns = await pool.query("SELECT * FROM user_earning WHERE user_id = $1",[userId])
+    if(!earns.rows.length) return res.status(500).json("There is no earning")
+    res.status(200).json({data: earns})
+}
+
+const createAnalytics = async (req,res) => {
+    const userId = req.user.id;
+    const {amount} = req.body
+    const earnDate = Date.now()
+    const earn = await pool.query("INSERT INTO user_earning (earning_amount,earning_date) VALUES ($1,$2) WHERE user_id = $3 RETURNING )*",[amount,earnDate,userId])
+    if(!earn.rows.length) return res.status(500).json("Failed to add earning")
+    res.status(201).json({
+        success: true,
+        data: earn
+    })
+}
+
+const getAnalytics = async (req,res) => {
+    const userId = req.body.id
+    const earns = await pool.query("SELECT * FROM user_earning WHERE user_id = $1",[userId])
+    if(!earns.rows.length) return res.status(500).json("There is no earning")
+    res.status(200).json({data: earns})
+}
+
 export default {
     createUser,
     getUser,
@@ -119,5 +163,7 @@ export default {
     getUserProfileImage,
     displayModeToggle,
     updateUserPassword,
-    updateUserEmail
+    updateUserEmail,
+    createEarning,
+    getEarning
 }

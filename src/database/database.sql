@@ -58,7 +58,7 @@ CREATE TABLE user_social (
 CREATE TABLE user_profile (
     profile_id serial PRIMARY KEY,
     user_id int REFERENCES users(user_id),
-    avatar_image_id int REFERENCES profile_image(image_id)
+    avatar_image_id int REFERENCES profile_image(profile_image_id)
 );
 
 -- UserPasswordTable
