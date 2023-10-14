@@ -1,5 +1,4 @@
 import express from "express"
-console.log("here")
 import dotenv from "dotenv"
 dotenv.config()
 const app = express()

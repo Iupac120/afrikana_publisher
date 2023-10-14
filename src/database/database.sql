@@ -9,9 +9,13 @@ CREATE TABLE users (
     password VARCHAR(255),
     social_media VARCHAR(255),
     display_mode BOOLEAN,
+    is_verified BOOLEAN DEFAULT FALSE,
+    otp INTEGER,
     password_hash VARCHAR(255),
     two_factor_auth_enabled BOOLEAN,
-    data_privacy_location VARCHAR(255)
+    data_privacy_location VARCHAR(255),
+    created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 );
 
 -- Profile Creation
@@ -19,7 +23,8 @@ CREATE TABLE user_profiles (
     user_id INT PRIMARY KEY,
     first_name VARCHAR(50),
     last_name VARCHAR(50),
-    avatar_url TEXT
+    avatar_url TEXT,
+    display_mode boolean DEFAULT TRUE
 );
 
 -- Account Settings

@@ -2,10 +2,10 @@ import pg from "pg";
 const {Pool} = pg
 
 let localConfigPool = {
-    user: process.env.USER,
-    password:process.env.PASSWORD,
-    host:process.env.HOST,
-    port:process.env.PORT,
+    user: process.env.pgUSER,
+    password:process.env.pgPASSWORD,
+    host:process.env.pgHOST,
+    port:process.env.pgPORT,
     database:process.env.DATABASE
 }
 

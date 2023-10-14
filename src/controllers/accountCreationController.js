@@ -3,12 +3,22 @@ import bcrypt from "bcrypt";
 import pool from "../database/db.js";
 import { jwtToken } from "../utils/jwt.js";
 import passport from "passport";
+import { sendMail } from "../utils/email.js";
+import otpUtils from "../utils/otp.js";
 
 
 const createUser = async (req,res) => {
     try {
-        const hashedPassword = await bcrypt.hash(req.body.password, 10)
-        const newUser = await pool.query("INSERT INTO users (user_name,user_email,user_password) VALUES ($1,$2,$3) RETURNING *",[req.body.name,req.body.email,hashedPassword])
+        const {userName,email,password} = req.body
+        const isEmail = await pool.query("SELECT user_email FROM users WHERE user_email = $1",[email])
+        if(isEmail.rows.length) return res.status(401).json("Emails exist please sign in")
+        const salt = await bcrypt.genSalt(10)
+        const hashedPassword = await bcrypt.hash(password, salt)
+        const otp = await otpUtils.otp()
+        const hashedOtp = await bcrypt.hash(otp,salt)
+        const newUser = await pool.query("INSERT INTO users (user_name,user_email,user_password,otp) VALUES ($1,$2,$3,$4) RETURNING *",[userName,email,hashedPassword,hashedOtp])
+        const message = await otpUtils.MessageOtp
+        await sendMail(email,message,otp)
         res.status(201).json({user:newUser.rows[0]})
     } catch (error) {
         res.status(500).json(error.message)
