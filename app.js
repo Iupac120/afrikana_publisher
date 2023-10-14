@@ -12,6 +12,8 @@ import {dirname, join} from "path"
 import { fileURLToPath } from "url"
 import {router as userRoute} from "./src/routes/profileCreationRoute.js"
 import {router as authRoute} from "./src/routes/accountCreationRoute.js"
+import { notFound } from "./src/errors/NotFoundError.js"
+import { errorHandler } from "./src/errors/errorHandler.js"
 const _dirname  = dirname(fileURLToPath(import.meta.url))
 app.use(express.json())
 const corsOptions = {
@@ -36,6 +38,10 @@ const port = process.env.PORT || 5000
 app.use(cookieParser())
 app.use("/api/user", userRoute)
 app.use("/api/register", authRoute)
+
+
+app.use(notFound)
+app.use(errorHandler)
 app.listen(port, () => {
     console.log(`app is listening to port ${port}`)
 })

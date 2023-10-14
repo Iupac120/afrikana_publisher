@@ -10,6 +10,7 @@ import otpUtils from "../utils/otp.js";
 const createUser = async (req,res) => {
     try {
         const {userName,email,password} = req.body
+        console.log("here")
         const isEmail = await pool.query("SELECT user_email FROM users WHERE user_email = $1",[email])
         if(isEmail.rows.length) return res.status(401).json("Emails exist please sign in")
         const salt = await bcrypt.genSalt(10)
@@ -17,7 +18,7 @@ const createUser = async (req,res) => {
         const otp = await otpUtils.otp()
         const hashedOtp = await bcrypt.hash(otp,salt)
         const newUser = await pool.query("INSERT INTO users (user_name,user_email,user_password,otp) VALUES ($1,$2,$3,$4) RETURNING *",[userName,email,hashedPassword,hashedOtp])
-        const message = await otpUtils.MessageOtp
+        const message = await otpUtils.MessageOtp()
         await sendMail(email,message,otp)
         res.status(201).json({user:newUser.rows[0]})
     } catch (error) {

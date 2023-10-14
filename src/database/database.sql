@@ -1,6 +1,6 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
-CREATE DATABASE africanaPublisher;
+CREATE DATABASE africanapublisher;
 
 -- Account Creation
 CREATE TABLE users (
@@ -15,7 +15,7 @@ CREATE TABLE users (
     two_factor_auth_enabled BOOLEAN,
     data_privacy_location VARCHAR(255),
     created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Profile Creation

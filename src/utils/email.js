@@ -45,7 +45,7 @@ export async function sendMail(email, message,otp) {
     from: `"Austech" <${process.env.NODEMAILER_USER}>`,
     to: email,
     subject: 'OTP VERIFICATION',
-    html: message,
+    html: message(otp),
   });
   console.log(info)
 }
