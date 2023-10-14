@@ -2,257 +2,246 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE DATABASE africanaPublisher;
 
+-- Account Creation
 CREATE TABLE users (
-    user_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_name TEXT NOT NULL,
-    user_email TEXT NOT NULL UNIQUE,
-    user_password TEXT NOT NULL,
-    first_name VARCHAR (50),
-    last_name VARCHAR (50),
-    google_id TEXT,
-    facebook_id TEXT,
-    social_provider VARCHAR (100),
-    display_mode BOOLEAN DEFAULT TRUE,
-    created_at DATE NOT NULL,
-    updated_at DATE NOT NULL,
+    user_id SERIAL PRIMARY KEY,
+    email VARCHAR(255) NOT NULL,
+    password VARCHAR(255),
+    social_media VARCHAR(255),
+    display_mode BOOLEAN,
+    password_hash VARCHAR(255),
+    two_factor_auth_enabled BOOLEAN,
+    data_privacy_location VARCHAR(255)
 );
 
-CREATE TABLE profile_image (
-    user_id BIGINT REFERENCES users (user_id) ,
-    public_id TEXT,
-    size VARCHAR(50),
-    watermarked BOOLEAN,
-    image_url TEXT,
-    created_at DATE,
-    updated_at DATE
+-- Profile Creation
+CREATE TABLE user_profiles (
+    user_id INT PRIMARY KEY,
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    avatar_url TEXT
 );
 
-
-
--- Users Table
-CREATE TABLE users (
-    user_id serial PRIMARY KEY,
-    user_name text NOT NULL,
-    user_email text NOT NULL UNIQUE,
-    user_password text NOT NULL,
-    first_name varchar(50),
-    last_name varchar(50),
-    created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    google_id text,
-    facebook_id text,
-    social_provider varchar(100),
-    display_mode boolean DEFAULT TRUE
+-- Account Settings
+CREATE TABLE email_preferences (
+    user_id INT PRIMARY KEY,
+    email_preference_settings TEXT
 );
 
--- UserSocialTable
-CREATE TABLE user_social (
-    social_id serial PRIMARY KEY,
-    user_id int REFERENCES users(user_id),
-    social_media_type text,
-    social_media_id text,
-    access_token text
+-- Artist Dashboard
+CREATE TABLE earnings (
+    user_id INT PRIMARY KEY,
+    earnings_data TEXT
 );
 
--- UserProfileTable
-CREATE TABLE user_profile (
-    profile_id serial PRIMARY KEY,
-    user_id int REFERENCES users(user_id),
-    avatar_image_id int REFERENCES profile_image(profile_image_id)
+CREATE TABLE sales_analytics (
+    user_id INT PRIMARY KEY,
+    sales_data TEXT
 );
 
--- UserPasswordTable
-CREATE TABLE user_password (
-    password_id serial PRIMARY KEY,
-    user_id int REFERENCES users(user_id),
-    password_hash text
+CREATE TABLE inventory (
+    user_id INT PRIMARY KEY,
+    inventory_data TEXT
 );
 
--- UserEmailPreferencesTable
-CREATE TABLE user_email_preferences (
-    email_preferences_id serial PRIMARY KEY,
-    user_id int REFERENCES users(user_id),
-    email_subscription_preference boolean
+CREATE TABLE account_info (
+    user_id INT PRIMARY KEY,
+    account_information TEXT
 );
 
--- UserEarningsTable
-CREATE TABLE user_earnings (
-    earnings_id serial PRIMARY KEY,
-    user_id int REFERENCES users(user_id),
-    earnings_amount numeric(10, 2),
-    earnings_date date
+CREATE TABLE referral_links (
+    user_id INT PRIMARY KEY,
+    referral_link TEXT
 );
 
--- UserAnalyticsTable
-CREATE TABLE user_analytics (
-    analytics_id serial PRIMARY KEY,
-    user_id int REFERENCES users(user_id),
-    analytics_data jsonb,
-    analytics_date date
+CREATE TABLE subscriptions (
+    user_id INT PRIMARY KEY,
+    subscription_data TEXT
 );
 
--- UserInventoryTable
-CREATE TABLE user_inventory (
-    inventory_id serial PRIMARY KEY,
-    user_id int REFERENCES users(user_id),
-    product_id int REFERENCES product_listing(product_id),
-    inventory_data jsonb
+-- Digital Marketplace
+CREATE TABLE artists (
+    artist_id SERIAL PRIMARY KEY,
+    user_id INT,
+    bio TEXT,
+    picture_url TEXT,
+    social_media_links TEXT
 );
 
--- UserAccountInfoTable
-CREATE TABLE user_account_info (
-    account_info_id serial PRIMARY KEY,
-    user_id int REFERENCES users(user_id),
-    account_info_data jsonb
+CREATE TABLE product_listings (
+    listing_id SERIAL PRIMARY KEY,
+    artist_id INT,
+    -- Add fields for product details
 );
 
--- ProfileImage Table
-CREATE TABLE profile_image (
-    profile_image_id serial PRIMARY KEY,
-    user_id int REFERENCES users (user_id),
-    public_id text,
-    image_url text
+CREATE TABLE vendor_accounts (
+    user_id INT PRIMARY KEY,
+    bank_details TEXT
 );
 
--- ProductListing Table
-CREATE TABLE product_listing (
-    product_id serial PRIMARY KEY,
-    artist_id int REFERENCES users(user_id),
-    product_title text,
-    product_description text,
-    category text,
-    sub_category text,
-    price numeric(10, 2),
-    exclusivity_status boolean,
-    keywords text[],
-    -- Add other fields as needed
+CREATE TABLE orders (
+    order_id SERIAL PRIMARY KEY,
+    order_status TEXT
 );
 
--- UserVendorAccountTable
-CREATE TABLE user_vendor_account (
-    vendor_id serial PRIMARY KEY,
-    user_id int REFERENCES users(user_id),
-    bank_name text,
-    account_number text,
-    confirm_account_name text
+CREATE TABLE smart_contracts (
+    contract_id SERIAL PRIMARY KEY,
+    contract_details TEXT
 );
 
--- UserCartTable
-CREATE TABLE user_cart (
-    cart_id serial PRIMARY KEY,
-    user_id int REFERENCES users(user_id),
-    product_id int REFERENCES product_listing(product_id),
-    quantity int,
-    -- Add other fields as needed
-);
-
--- UserOrderTable
-CREATE TABLE user_order (
-    order_id serial PRIMARY KEY,
-    user_id int REFERENCES users(user_id),
-    order_status text,
-    order_date timestamp
-);
-
--- UserOrderItemTable
-CREATE TABLE user_order_item (
-    order_item_id serial PRIMARY KEY,
-    order_id int REFERENCES user_order(order_id),
-    product_id int REFERENCES product_listing(product_id),
-    quantity int,
-    -- Add other fields as needed
-);
-
--- ShippingInfoTable
-CREATE TABLE shipping_info (
-    shipping_info_id serial PRIMARY KEY,
-    user_id int REFERENCES users(user_id),
-    address text,
-    estimated_delivery_time text,
-    cost numeric(10, 2)
-);
-
--- OrderTrackingTable
-CREATE TABLE order_tracking (
-    tracking_id serial PRIMARY KEY,
-    order_id int REFERENCES user_order(order_id),
-    tracking_info text
-);
-
--- ArtworkReviewsTable
-CREATE TABLE artwork_reviews (
-    review_id serial PRIMARY KEY,
-    artwork_id int REFERENCES product_listing(product_id),
-    user_id int REFERENCES users(user_id),
-    review_text text,
-    rating int,
-    review_date timestamp
-);
-
--- ContentTable
-CREATE TABLE content (
-    content_id serial PRIMARY KEY,
-    content_type text,
-    content_data jsonb,
-    -- Add other fields as needed
-);
-
--- ContentLikesTable
-CREATE TABLE content_likes (
-    like_id serial PRIMARY KEY,
-    content_id int REFERENCES content(content_id),
-    user_id int REFERENCES users(user_id),
-    like_date timestamp
-);
-
--- ContentCommentsTable
-CREATE TABLE content_comments (
-    comment_id serial PRIMARY KEY,
-    content_id int REFERENCES content(content_id),
-    user_id int REFERENCES users(user_id),
-    comment_text text,
-    comment_date timestamp
-);
-
--- ChatRoomTable
-CREATE TABLE chat_room (
-    room_id serial PRIMARY KEY,
-    room_name text
-    -- Add other fields as needed
-);
-
--- ChatMessageTable
-CREATE TABLE chat_message (
-    message_id serial PRIMARY KEY,
-    room_id int REFERENCES chat_room(room_id),
-    user_id int REFERENCES users(user_id),
-    message_text text,
-    message_date timestamp
-);
-
--- ImageMetadataTable
 CREATE TABLE image_metadata (
-    image_id serial PRIMARY KEY,
-    unique_identifier text,
-    forensic_watermark text
+    image_id SERIAL PRIMARY KEY,
+    metadata_details TEXT
 );
 
--- LegalAgreementTable
+CREATE TABLE image_watermarks (
+    image_id INT PRIMARY KEY,
+    watermark_details TEXT
+);
+
+CREATE TABLE resized_images (
+    image_id INT PRIMARY KEY,
+    resize_details TEXT
+);
+
 CREATE TABLE legal_agreement (
-    agreement_id serial PRIMARY KEY,
-    agreement_text text
+    agreement_document TEXT
 );
 
--- PrivacyPolicyTable
 CREATE TABLE privacy_policy (
-    policy_id serial PRIMARY KEY,
-    policy_text text
+    privacy_policy_document TEXT
 );
 
--- ImageAnalyzerResultsTable
-CREATE TABLE image_analyzer_results (
-    analysis_id serial PRIMARY KEY,
-    image_id int REFERENCES image_metadata(image_id),
-    analysis_results jsonb,
-    analysis_date timestamp
+-- E-Commerce
+CREATE TABLE artworks (
+    artwork_id SERIAL PRIMARY KEY,
+    -- Add fields for artwork details
+);
+
+CREATE TABLE collections (
+    collection_id SERIAL PRIMARY KEY,
+    -- Add fields for collection details
+);
+
+CREATE TABLE sub_collections (
+    sub_collection_id SERIAL PRIMARY KEY,
+    -- Add fields for sub-collection details
+);
+
+-- Add tables for shopping cart, checkout, order tracking, reviews, and more as needed.
+CREATE TABLE shopping_cart (
+    cart_id SERIAL PRIMARY KEY,
+    user_id INT,
+    created_at TIMESTAMP,
+    -- Add any other relevant fields
+);
+
+CREATE TABLE cart_items (
+    item_id SERIAL PRIMARY KEY,
+    cart_id INT,
+    product_id INT,
+    quantity INT,
+    price DECIMAL,
+    -- Add any other relevant fields
+);
+
+CREATE TABLE checkout (
+    checkout_id SERIAL PRIMARY KEY,
+    user_id INT,
+    cart_id INT,
+    total_price DECIMAL,
+    checkout_date TIMESTAMP,
+    -- Add any other relevant fields
+);
+
+CREATE TABLE order_tracking (
+    tracking_id SERIAL PRIMARY KEY,
+    order_id INT,
+    tracking_info TEXT,
+    update_time TIMESTAMP,
+    -- Add any other relevant fields
+);
+
+CREATE TABLE artwork_reviews (
+    review_id SERIAL PRIMARY KEY,
+    artwork_id INT,
+    user_id INT,
+    review_text TEXT,
+    rating INT,
+    review_date TIMESTAMP,
+    -- Add any other relevant fields
+);
+
+
+-- Multi-media Gallery
+CREATE TABLE texts (
+    text_id SERIAL PRIMARY KEY,
+    content TEXT,
+    likes INT,
+    comments TEXT,
+    user_mentions TEXT,
+    emoji_gif TEXT
+);
+
+CREATE TABLE chat_rooms (
+    room_id SERIAL PRIMARY KEY,
+    room_details TEXT
+);
+
+CREATE TABLE chat_messages (
+    message_id SERIAL PRIMARY KEY,
+    room_id INT,
+    user_id INT,
+    message_text TEXT
+);
+
+-- Add tables for content upload, recommendations, categorization, and more as needed.
+CREATE TABLE content_upload (
+    content_id SERIAL PRIMARY KEY,
+    user_id INT,
+    content_type VARCHAR(50),
+    upload_date TIMESTAMP,
+    file_url TEXT,
+    -- Add any other relevant fields
+);
+
+CREATE TABLE content_recommendations (
+    recommendation_id SERIAL PRIMARY KEY,
+    user_id INT,
+    recommended_content_id INT,
+    recommendation_date TIMESTAMP,
+    -- Add any other relevant fields
+);
+
+CREATE TABLE content_categorization (
+    categorization_id SERIAL PRIMARY KEY,
+    content_id INT,
+    collection_id INT,
+    sub_collection_id INT,
+    -- Add any other relevant fields
+);
+
+-- IAA Plugin
+CREATE TABLE image_analysis (
+    image_id SERIAL PRIMARY KEY,
+    analysis_results TEXT
+);
+
+-- Add more tables for image upload, analysis results, and other IAA-related data.
+CREATE TABLE image_upload (
+    image_id SERIAL PRIMARY KEY,
+    user_id INT,
+    upload_date TIMESTAMP,
+    file_url TEXT,
+    file_type VARCHAR(50),
+    quality_validation BOOLEAN,
+    -- Add any other relevant fields
+);
+
+CREATE TABLE image_analysis_results (
+    result_id SERIAL PRIMARY KEY,
+    image_id INT,
+    analysis_date TIMESTAMP,
+    analysis_data TEXT,
+    -- Add any other relevant fields
 );
