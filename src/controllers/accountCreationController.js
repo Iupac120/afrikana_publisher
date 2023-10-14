@@ -10,7 +10,7 @@ import otpUtils from "../utils/otp.js";
 const createUser = async (req,res) => {
     try {
         const {userName,email,password} = req.body
-        console.log("here")
+        console.log("HERE")
         const isEmail = await pool.query("SELECT user_email FROM users WHERE user_email = $1",[email])
         if(isEmail.rows.length) return res.status(401).json("Emails exist please sign in")
         const salt = await bcrypt.genSalt(10)

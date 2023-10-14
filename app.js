@@ -14,6 +14,7 @@ import {router as userRoute} from "./src/routes/profileCreationRoute.js"
 import {router as authRoute} from "./src/routes/accountCreationRoute.js"
 import { notFound } from "./src/errors/NotFoundError.js"
 import { errorHandler } from "./src/errors/errorHandler.js"
+import pool from "./src/database/db.js"
 const _dirname  = dirname(fileURLToPath(import.meta.url))
 app.use(express.json())
 const corsOptions = {
@@ -42,6 +43,10 @@ app.use("/api/register", authRoute)
 
 app.use(notFound)
 app.use(errorHandler)
-app.listen(port, () => {
-    console.log(`app is listening to port ${port}`)
-})
+const start = async () => {
+    await console.log(pool)
+    app.listen(port, () => {
+        console.log(`app is listening to port ${port}`)
+    })
+}
+start()
