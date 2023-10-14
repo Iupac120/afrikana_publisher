@@ -2,7 +2,7 @@ import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { Strategy as facebookStrategy } from "passport-facebook";
 import dotenv from "dotenv"
-import pool from "../database/db";
+import pool from "../database/db.js";
 dotenv.config()
 
 const getProfile = (profile) => {

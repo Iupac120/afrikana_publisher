@@ -1,7 +1,9 @@
 import express from "express"
+console.log("here")
 import dotenv from "dotenv"
 dotenv.config()
 const app = express()
+import morgan from "morgan"
 import cookieParser from "cookie-parser"
 import cors from "cors"
 import passport from "passport";
@@ -9,8 +11,8 @@ import "./src/utils/passport.js"
 import cookieSession from "cookie-session";
 import {dirname, join} from "path"
 import { fileURLToPath } from "url"
-import {router as userRoute} from "./src/routes/userRouter.js"
-import {router as authRoute} from "./src/routes/authRoute.js"
+import {router as userRoute} from "./src/routes/profileCreationRoute.js"
+import {router as authRoute} from "./src/routes/accountCreationRoute.js"
 const _dirname  = dirname(fileURLToPath(import.meta.url))
 app.use(express.json())
 const corsOptions = {
@@ -20,6 +22,7 @@ const corsOptions = {
     }
 app.use(cors(corsOptions))
 app.use(express.static('public'))
+app.use(morgan())
 app.use(
     cookieSession({
         name:"session",
@@ -32,8 +35,8 @@ app.use(passport.session())
 
 const port = process.env.PORT || 5000
 app.use(cookieParser())
-app.use("/api/v1/user", userRoute)
-app.use("/api/v1/auth", authRoute)
+app.use("/api/user", userRoute)
+app.use("/api/register", authRoute)
 app.listen(port, () => {
     console.log(`app is listening to port ${port}`)
 })

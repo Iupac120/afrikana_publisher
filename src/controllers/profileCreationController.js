@@ -12,16 +12,7 @@ const getUser = async (req,res) => {
     }
 }
 
-const createUser = async (req,res) => {
-    try {
-        const hashedPassword = await bcrypt.hash(req.body.password, 10)
-        const newUser = await pool.query("INSERT INTO users (user_name,user_email,user_password,created_at,updated_at) VALUES ($1,$2,$3,$4,$5) RETURNING *",[req.body.name,req.body.email,hashedPassword,Date.now(),Date.now()])
-        res.status(201).json({user:newUser.rows[0]})
-    } catch (error) {
-        res.status(500).json(error.message)
-    }
 
-}
 
 //profile creation
 
@@ -156,7 +147,6 @@ const getAnalytics = async (req,res) => {
 }
 
 export default {
-    createUser,
     getUser,
     uploadProfileImage,
     updateProfileName,

@@ -5,6 +5,17 @@ import { jwtToken } from "../utils/jwt.js";
 import passport from "passport";
 
 
+const createUser = async (req,res) => {
+    try {
+        const hashedPassword = await bcrypt.hash(req.body.password, 10)
+        const newUser = await pool.query("INSERT INTO users (user_name,user_email,user_password) VALUES ($1,$2,$3) RETURNING *",[req.body.name,req.body.email,hashedPassword])
+        res.status(201).json({user:newUser.rows[0]})
+    } catch (error) {
+        res.status(500).json(error.message)
+    }
+
+}
+
 const userLogin = async(req,res) => {
     try {
         const {email,password} = req.body
@@ -66,6 +77,7 @@ const loginFailure = (req,res) => {
 }
 
 export default {
+    createUser,
     userLogin,
     refreshLogin,
     logout,

@@ -1,6 +1,7 @@
 import express from "express";
 const router = express.Router()
-import authController from "../controllers/authController.js"
+import authController from "../controllers/accountCreationController.js"
+router.post("/",authController.createUser)
 router.post("/login", authController.userLogin)
 router.post("/refresh", authController.refreshLogin)
 router.post("/logout", authController.logout)
