@@ -44,7 +44,7 @@ app.use("/api/register", authRoute)
 app.use(notFound)
 app.use(errorHandler)
 const start = async () => {
-    await console.log(pool)
+    await console.log(pool.options)
     app.listen(port, () => {
         console.log(`app is listening to port ${port}`)
     })
