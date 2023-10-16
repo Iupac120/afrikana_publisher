@@ -22,7 +22,7 @@ passport.use(
     new GoogleStrategy({
         clientID:process.env.GOOGLECLIENT_ID,
         clientSecret:process.env.GOOGLECLIENT_SECRET,
-        callbackURL:"/auth/google/callback",
+        callbackURL:"https://localhost:5000/api/register/auth/google/callback",
         scope:["profile","email"]
     },
     async (accessToken,refreshToken,profile,callback) => {

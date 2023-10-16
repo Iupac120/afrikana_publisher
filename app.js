@@ -8,6 +8,7 @@ import cors from "cors"
 import passport from "passport";
 import "./src/utils/passport.js"
 import cookieSession from "cookie-session";
+import expressSession from 'express-session';
 import {dirname, join} from "path"
 import { fileURLToPath } from "url"
 import {router as userRoute} from "./src/routes/profileCreationRoute.js"
@@ -26,9 +27,11 @@ app.use(cors(corsOptions))
 app.use(express.static('public'))
 app.use(morgan())
 app.use(
-    cookieSession({
-        name:"session",
-        keys:["passanta69"],
+    expressSession({
+        secret:"mySecret",
+        resave: false,
+        saveUninitialized: true,
+        cookie:{secure: false}, //set true on https
         maxAge:24*60*60*1000
     })
 )

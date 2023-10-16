@@ -9,25 +9,27 @@
 <body>
     <div class="container">
         <h1>Sign Up</h1>
-        <form id="signup-form" method="POST" action="/api/register">
-            <label for="userName">Username</label>
-            <input type="text" id="userName" name="userName" required>
-
-            <label for="email">Email</label>
-            <input type="email" id="email" name="email" required>
-
-            <label for="password">Password</label>
-            <input type="password" id="password" name="password" required>
-
-            <button type="submit">Sign Up</button>
-        </form>
-        <form action="/api/register/social" method="post">
-            <div class="social-login">
-                <p>Or sign up with:</p>
-                <a href="/google/callback"><button class="google">Google</button></a>
-                <a href="/facebook/callback"><button class="facebook">Facebook</button></a>
-            </div>
-        </form>
+        <div>
+            <form id="signup-form" method="POST" action="/api/register">
+                <label for="userName">Username</label>
+                <input type="text" id="userName" name="userName" required>
+    
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+    
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+    
+                <button type="submit">Sign Up</button>
+            </form>
+        </div>
+        <div>
+                <div class="social-login">
+                    <p>Or sign up with:</p>
+                    <a href="/api/register/auth/google">google</a>
+                    <a href="api/register/auth/facebook">Facebook</a>
+                </div>
+        </div>
     </div>
 </body>
 </html>

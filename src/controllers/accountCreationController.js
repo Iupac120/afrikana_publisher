@@ -128,19 +128,28 @@ const logout = async (req,res) => {
     }
 }
 
-const googleLogin =  (req,res) =>{
-    console.log("here")
-    passport.authenticate("google",{
+const googleAuth = passport.authenticate('google',{
+    scope:['email profile']
+})
+
+const isLoggedIn = (req,res,next) => {
+    req.user?next ():res.sendStatus(401)
+}
+const googleLogin = passport.authenticate('google',{
+        successRedirect:"/profile",//process.env.CLIENT_URL,
+        failureRedirect:"/login/failed"
+    })
+
+const userProfile = (req,res) => {
+    console.log(req.user)
+    res.status(200).json("This is user profile")
+}
+
+const facebookLogin =  passport.authenticate("facebook",{
         successRedirect:process.env.CLIENT_URL,
         failureRedirect:"/login/failed"
     })
-}
-const facebookLogin =  function (){
-    passport.authenticate("facebook",{
-        successRedirect:process.env.CLIENT_URL,
-        failureRedirect:"/login/failed"
-    })
-}
+
 
 const loginFailure = (req,res) => {
     res.status(401).json({
@@ -158,7 +167,10 @@ export default {
     userLogin,
     refreshLogin,
     logout,
+    googleAuth,
     googleLogin,
     facebookLogin,
-    loginFailure
+    loginFailure,
+    isLoggedIn,
+    userProfile
 }

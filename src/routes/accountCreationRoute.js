@@ -12,9 +12,18 @@ router.post("/reset-password-link", trycatchHandler(authController.resetPassword
 router.post("/reset-password", trycatchHandler(authController.resetPassword))
 router.get("/refresh", authController.refreshLogin)
 router.get("/logout", authController.logout)
-router.get("/social/google/callback", passport.authenticate("google",{scope:['profile email']}))
-//router.get("/social/google/callback", authController.googleLogin)
-router.get("/social/facebook/callback", authController.facebookLogin)
+//router.get("/social/google/callback", passport.authenticate("google",{scope:['profile email']}))
+router.get("/auth/google", passport.authenticate('google',{
+    scope:["profile","email"]
+})
+)
+router.get("/auth/google/callback", passport.authenticate('google',{
+    successRedirect:"/api/register/profile",//process.env.CLIENT_URL,
+    failureRedirect:"/api/register/login/failed"
+})
+)
+router.get("/auth/facebook/callback", authController.facebookLogin)
+router.get("/profile",authController.isLoggedIn,authController.userProfile)
 router.get("/login/failed", authController.loginFailure)
 
 export  {router}
