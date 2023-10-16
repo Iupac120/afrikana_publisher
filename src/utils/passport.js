@@ -27,6 +27,7 @@ passport.use(
     },
     async (accessToken,refreshToken,profile,callback) => {
         //callback(null,profile)
+        console.log("googleProfile",profile)
         try{
             const existingGoogleAccount = await pool.query("SELECT * FROM users WHERE google_id = $1",[profile.id])
             if(!existingGoogleAccount){
@@ -54,6 +55,7 @@ passport.use(
         },
         async (accessToken,refreshToken,profile,callback) => {
             //callback(null,profile)
+            console.log("facebookProfile",profile)
             try{
                 const existingFacebookAccount = await pool.query("SELECT * FROM users WHERE facebook_id = $1",[profile.id])
                 if(!existingFacebookAccount){

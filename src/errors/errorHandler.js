@@ -1,4 +1,4 @@
-
+import { CustomError } from "./customError.js";
 export const errorHandler = ((err, req, res, next) => {
     if (err instanceof CustomError) {
       res.status(err.statusCode).json({ error: err.message });
