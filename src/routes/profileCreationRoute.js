@@ -5,7 +5,8 @@ import { authenticateUser } from "../middleware/authorization.js"
 import upload from "../middleware/multer.js";
 
 router.get("/users",authenticateUser, userController.getUser)
-router.post("/profile",authenticateUser,userController.updateProfileName)
+router.post("/profile",authenticateUser,userController.createProfileName)
+router.put("/profile",authenticateUser,userController.updateProfileName)
 router.post("/avatar",authenticateUser,upload.single('image'),userController.uploadProfileImage)
 router.get("/avatar",authenticateUser,userController.getUserProfileImage)
 router.put("/display-mode",authenticateUser,userController.displayModeToggle)

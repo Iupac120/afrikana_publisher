@@ -16,11 +16,23 @@ const getUser = async (req,res) => {
 
 //profile creation
 
+const createProfileName = async (req,res) => {
+    const {firstName, lastName} = req.body
+    const userId = req.user.id
+    console.log("userId",req.user.id)
+   const names = await pool.query("INSERT INTO user_profiles (user_id,first_name,last_name) VALUES($1,$2,$3) RETURNING first_name,last_name",[userId,firstName,lastName])
+   if(!names.rows.length){
+    return res.status(500).json("Failed to update")
+   }
+    res.status(201).json({sucees: true, data:names.rows[0]})
+}
+
+
 const updateProfileName = async (req,res) => {
     const {firstName, lastName} = req.body
     const userId = req.user.id
-    console.log("userId",req.user)
-   const names = await pool.query("INSERT INTO user_profiles (user_id,first_name,last_name) VALUES($1,$2,$3) RETURNING ",[userId,firstName,lastName])
+    console.log("userId",req.user.id)
+   const names = await pool.query("UPDATE user_profiles SET first_name = $1,last_name =$2 WHERE user_id = $3 RETURNING first_name,last_name",[firstName,lastName,userId])
    if(!names.rows.length){
     return res.status(500).json("Failed to update")
    }
@@ -150,6 +162,7 @@ const getAnalytics = async (req,res) => {
 
 export default {
     getUser,
+    createProfileName,
     uploadProfileImage,
     updateProfileName,
     getUserProfileImage,
