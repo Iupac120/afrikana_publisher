@@ -22,7 +22,8 @@ CREATE TABLE users (
 
 -- Profile Creation
 CREATE TABLE user_profiles (
-    user_id INT PRIMARY KEY,
+    user_profiles_id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES users(user_id),
     first_name VARCHAR(50),
     last_name VARCHAR(50),
     avatar_url TEXT,

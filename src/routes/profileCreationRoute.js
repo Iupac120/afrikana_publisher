@@ -2,7 +2,7 @@ import express from "express"
 const router = express.Router()
 import userController from "../controllers/profileCreationController.js"
 import { authenticateUser } from "../middleware/authorization.js"
-import upload from "../middleware/multer.js"
+import upload from "../middleware/multer.js";
 
 router.get("/users",authenticateUser, userController.getUser)
 router.post("/profile",authenticateUser,userController.updateProfileName)

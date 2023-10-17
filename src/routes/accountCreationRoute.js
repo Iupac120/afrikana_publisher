@@ -14,7 +14,7 @@ router.get("/refresh", authController.refreshLogin)
 router.get("/logout", authController.logout)
 //router.get("/social/google/callback", passport.authenticate("google",{scope:['profile email']}))
 router.get("/auth/google", passport.authenticate('google',{
-    scope:["profile","email"]
+    scope:['profile','email']
 })
 )
 router.get("/auth/google/callback", passport.authenticate('google',{
@@ -22,7 +22,14 @@ router.get("/auth/google/callback", passport.authenticate('google',{
     failureRedirect:"/api/register/login/failed"
 })
 )
-router.get("/auth/facebook/callback", authController.facebookLogin)
+
+router.get("/auth/facebook", passport.authenticate('facebook'))
+router.get("/auth/facebook/callback", passport.authenticate('facebook',{
+    successRedirect:"/api/register/profile",//process.env.CLIENT_URL,
+    failureRedirect:"/api/register/login/failed"
+})
+)
+//router.get("/auth/facebook/callback", authController.facebookLogin)
 router.get("/profile",authController.isLoggedIn,authController.userProfile)
 router.get("/login/failed", authController.loginFailure)
 
