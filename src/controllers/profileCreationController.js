@@ -43,6 +43,8 @@ const updateProfileName = async (req,res) => {
 const uploadProfileImage = async (req,res) => {
     //const {image} = req.body
     const userId = req.user.id //authorization middleware
+    console.log("path",req.file.path)
+    console.log("userId",req.user.id)
     cloudinary.uploader.upload(req.file.path,{
         folder:"profile",
         width: 300,
@@ -55,24 +57,26 @@ const uploadProfileImage = async (req,res) => {
                 message:"Error"
             })
         }
-        const public_id = result.public_id
+        //const public_id = result.public_id
+        console.log("result",result)
         const image_url = result.url
-        const imageId = await pool.query("INSERT INTO profile_image (public_id,image_url) VALUES ($1,$2) WHERE user_id = $3",[public_id,image_url,userId])
-        comsole.log(imageId)
-        const userProfile = await pool.query("SELECT image_url FROM profile_image WHERE user_id =$1",[userId])
+        console.log("datatype",typeof(image_url))
+        const imageId = await pool.query("UPDATE user_profiles SET avatar_url = $1 WHERE user_id = $2 RETURNING avatar_url",[image_url,userId])
+        console.log(imageId.rows[0])
+        //const userProfile = await pool.query("SELECT image_url FROM profile_image WHERE user_id =$1",[userId])
         res.status(200).json({
             success: true,
             message:"uploaded",
-            data: userProfile
+            data: imageId.rows[0]
         })
     })
 } 
 
 const getUserProfileImage = async (req,res) => {
     const userId = req.user.id
-    const profileImage = await pool.query("SELECT profile_image.image_url FROM profile_image WHERE users.user_id = $1",[userId])
+    const profileImage = await pool.query("SELECT avatar_url FROM user_profiles WHERE user_id = $1",[userId])
     if(!profileImage.rows.length){
-        return res.status(500).json("update failed")
+        return res.status(500).json("Failed to get user image")
     }
     return res.status(200).json({
         success: true,
@@ -80,15 +84,22 @@ const getUserProfileImage = async (req,res) => {
     })
 }
 const displayModeToggle = async (req,res) => {
+    const {display} = req.query
     const userId = req.user.id
-    const toggleDisplay = await pool.query("SELECT users.user_id,users.user_name,users.first_name,users.last_name,profile_image_image_url FROM users LEFT JOIN profile_image ON users.user_id = profile_image.user_id WHERE user_id = $1 AND display_mode = TRUE",[userId])
-    if(!toggleDisplay.rows.length){
-        await pool.query("SELECT user_name FROM users WHERE user_id = $1"[userId])
-    }
-    res.status(201).json({
-        siucces: true,
-        data:toggleDisplay
+    if(display){
+        const toggleDisplay = await pool.query("SELECT users.user_name,avatar_url FROM users LEFT JOIN user_profiles ON users.user_id = user_profiles.user_id")
+         res.status(201).json({
+        success: true,
+        data:toggleDisplay.rows[0]
     })
+    }else {
+        const toggleDisplay= await pool.query("SELECT user_name FROM users WHERE user_id = $1",[userId])
+        res.status(201).json({
+            success: true,
+            data:toggleDisplay.rows[0]
+        })
+    }
+   
 }
 
 //account setting
