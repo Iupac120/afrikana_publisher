@@ -29,6 +29,59 @@ CREATE TABLE user_profiles (
     avatar_url TEXT,
     display_mode boolean DEFAULT TRUE
 );
+CREATE TABLE category (
+    category_id SERIAL PRIMARY KEY,
+    category_name VARCHAR (100)
+
+);
+--sub category
+CREATE TABLE sub_category (
+    sub_category_id SERIAL PRIMARY KEY,
+    category_id INT REFERENCES category(category_id),
+    dimension_id INT REFERENCES dimension(dimension_id)
+    product_id INT REFERENCES product(product_id)
+    quantity_stock INT,
+    minimum_stock INT,
+    maximum_stock INT,
+);
+-- ProductListing Table
+CREATE TABLE product (
+    product_id serial PRIMARY KEY,
+    artist_id int REFERENCES users(user_id),
+    product_title VARCHAR(50),
+    product_description VARCHAR(100),
+    category_id INT REFERENCES category (category_id),
+    price INT NOT NULL,
+    exclusivity_status BOOLEAN DEFAULT FALSE,
+    keywords VARCHAR(50),
+    created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+-- Dimension table
+CREATE TABLE dimension (
+    dimension_id SERIAL PRIMARY KEY,
+    product_id INT REFERENCES product (product_id),
+    dimension INT,
+    unit INT NOT NULL
+);
+CREATE TABLE account_info (
+    account_info_id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES users(user_id),
+    account_name VARCHAR(250) NOT NULL,
+    account_number INT NOT NULL,
+    bank VARCHAR(50)
+);
+
+
+
+-- Digital Marketplace
+CREATE TABLE artists (
+    artist_id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES users(user_id),
+    bio VARCHAR(250),
+    social_media_links VARCHAR(250)
+);
+
 
 -- Account Settings
 CREATE TABLE email_preferences (
@@ -39,7 +92,9 @@ CREATE TABLE email_preferences (
 -- Artist Dashboard
 CREATE TABLE earnings (
     user_id INT PRIMARY KEY,
-    earnings_data TEXT
+    amount INT NOT NULL,
+    earning_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    earning_source VARCHAR(100) NOT NULL,
 );
 
 CREATE TABLE sales_analytics (
@@ -52,10 +107,7 @@ CREATE TABLE inventory (
     inventory_data TEXT
 );
 
-CREATE TABLE account_info (
-    user_id INT PRIMARY KEY,
-    account_information TEXT
-);
+
 
 CREATE TABLE referral_links (
     user_id INT PRIMARY KEY,
@@ -67,14 +119,7 @@ CREATE TABLE subscriptions (
     subscription_data TEXT
 );
 
--- Digital Marketplace
-CREATE TABLE artists (
-    artist_id SERIAL PRIMARY KEY,
-    user_id INT,
-    bio TEXT,
-    picture_url TEXT,
-    social_media_links TEXT
-);
+
 
 CREATE TABLE product_listings (
     listing_id SERIAL PRIMARY KEY,

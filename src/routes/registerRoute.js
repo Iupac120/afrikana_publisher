@@ -1,7 +1,7 @@
 import express from "express";
 import passport from "passport"
 const router = express.Router()
-import authController from "../controllers/accountCreationController.js"
+import authController from "../controllers/registerController.js"
 import { trycatchHandler } from "../utils/trycatchHandler.js";
 
 router.post("/", trycatchHandler(authController.createUser))

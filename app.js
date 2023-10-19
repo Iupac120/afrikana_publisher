@@ -11,8 +11,8 @@ import cookieSession from "cookie-session";
 import expressSession from 'express-session';
 import {dirname, join} from "path"
 import { fileURLToPath } from "url"
-import {router as userRoute} from "./src/routes/profileCreationRoute.js"
-import {router as authRoute} from "./src/routes/accountCreationRoute.js"
+import {router as userRoute} from "./src/routes/userRoute.js"
+import {router as authRoute} from "./src/routes/registerRoute.js"
 import { notFound } from "./src/errors/NotFoundError.js"
 import { errorHandler } from "./src/errors/errorHandler.js"
 import pool from "./src/database/db.js"

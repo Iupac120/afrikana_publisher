@@ -102,18 +102,19 @@ const displayModeToggle = async (req,res) => {
    
 }
 
+
 //account setting
 
 const updateUserPassword = async (req,res) => {
     const userId = req.user.id
-    const userPass = await pool.query("SELECT user_password FROM users WHERE user_id = $1",[userId])
+    const userPass = await pool.query("SELECT user_password,user_name FROM users WHERE user_id = $1",[userId])
     if(!userPass.rows.length) return res.status(500).json("Failed to get user pass")
     const userPassNo = userPass.rows[0]
     const {password, newPassword} = req.body
-    const isMatch = await bcrypt.compare(userPassNo,password)
+    const isMatch = await bcrypt.compare(password,userPassNo)
     if(!isMatch) return res.status(500).json("Password does not match")
     const hashedPassword = await bcrypt.hash(newPassword,10)
-    const updateUserPass = await query.pool("UPDATE users SET user_password = $1 WHERE user_id = $2",[hashedPassword,userId])
+    const updateUserPass = await query.pool("UPDATE users SET user_password = $1 WHERE user_id = $2 RETURNING user_name",[hashedPassword,userId])
     if(!updateUserPass.rows.length) return res.status(500).json("Failed to update user")
     return res.status(200).json("User updated successfully")
 }
@@ -170,6 +171,7 @@ const getAnalytics = async (req,res) => {
     if(!earns.rows.length) return res.status(500).json("There is no earning")
     res.status(200).json({data: earns})
 }
+
 
 export default {
     getUser,
