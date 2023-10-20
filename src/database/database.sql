@@ -31,7 +31,10 @@ CREATE TABLE user_profiles (
 );
 CREATE TABLE category (
     category_id SERIAL PRIMARY KEY,
-    category_name VARCHAR (100)
+    category_name VARCHAR (100) NOT NULL,
+    created_by INT REFERENCES users (user_id) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 
 );
 --sub category
@@ -48,7 +51,7 @@ CREATE TABLE sub_category (
 CREATE TABLE product (
     product_id serial PRIMARY KEY,
     artist_id int REFERENCES users(user_id),
-    product_title VARCHAR(50),
+    product_title VARCHAR(50) NOT NULL,
     product_description VARCHAR(100),
     category_id INT REFERENCES category (category_id),
     price INT NOT NULL,
@@ -80,8 +83,15 @@ CREATE TABLE artist (
     user_id INT REFERENCES users(user_id) UNIQUE,
     stage_name VARCHAR (50),
     bio VARCHAR(250),
-    social_media_links VARCHAR(250)
+    social_media_links VARCHAR(250) NOT NULL
 );
+
+-- CREATE TABLE social_media (
+--     social_media_id SERIAL PRIMARY KEY,
+--     user_id INT REFERENCES users(user_id) UNIQUE,
+--     social_provide VARCHAR(50) NOT NULL,
+--     social_media_links VARCHAR(250) NOT NULL
+-- )
 
 
 -- Account Settings

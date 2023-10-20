@@ -2,7 +2,7 @@ import express, { query } from "express";
 import bcrypt from "bcrypt";
 import pool from "../database/db.js"
 import cloudinary from "../utils/cloudinary.js";
-import { NotFoundError } from "../errors/customError.js";
+import { NotFoundError, UnAuthorizedError } from "../errors/customError.js";
 
 const getUser = async (req,res) => {
     try {
@@ -136,7 +136,9 @@ const updateUserEmail = async (req,res) => {
 //digital market place
 const createArtist = async (req,res) => {
     const userId = req.user.id;
-    const {name,bio,socialLink} = req.body
+    const {name,bio,socialLink} = req.body;
+    const artistExist = await pool.query("SELECT user_id FROM artist WHERE user_id = $1",[userId]);
+    if(artist.rows.length) return next(new UnAuthorizedError("You have alreday created an artist account"))
     const artist = await pool.query("INSERT INTO artist (user_id,bio,social_media_links,stage_name) VALUES ($1,$2,$3,$4) RETURNING stage_name",[userId,bio,socialLink,name]);
     if(!artist.rows.length) return next(new NotFoundError("Failed to create artist"))
     const newArtist = await pool.query("SELECT artist.stage_name,artist.bio,artist.social_media_links,user_profiles.avatar_url FROM artist JOIN user_profiles ON artist.user_id = user_profiles.user_id WHERE artist.user_id = $1",[userId])

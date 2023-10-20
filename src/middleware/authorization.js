@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken"
 import dotenv from "dotenv"
+import { UnAuthorizedError } from "../errors/customError.js"
 dotenv.config()
 
 function authenticateUser (req,res,next) {
@@ -14,5 +15,14 @@ function authenticateUser (req,res,next) {
     next()
     })
 }
-
-export {authenticateUser}
+function authenticateAdmin (req,res,next){
+    return (authenticateUser,(req,res,next) => {
+        if(req.user.admin){
+            console.log("admin",req.user.admin)
+            return next()
+        }else{
+            return next(new UnAuthorizedError("You are not authorized to access the route"))
+        }
+    })
+}
+export {authenticateUser,authenticateAdmin}
