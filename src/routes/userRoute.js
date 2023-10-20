@@ -12,6 +12,7 @@ router.get("/avatar",authenticateUser,userController.getUserProfileImage)
 router.get("/display-mode",authenticateUser,userController.displayModeToggle)
 router.put("/password",authenticateUser,userController.updateUserPassword)
 router.put("/email-preference",authenticateUser,userController.updateUserEmail)
+router.post("/artist/profile",authenticateUser,userController.createArtist)
 router.post("/earnings",authenticateUser,userController.createEarning)
 router.get("/earnings",authenticateUser,userController.getEarning)
 

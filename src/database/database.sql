@@ -75,9 +75,10 @@ CREATE TABLE account_info (
 
 
 -- Digital Marketplace
-CREATE TABLE artists (
+CREATE TABLE artist (
     artist_id SERIAL PRIMARY KEY,
-    user_id INT REFERENCES users(user_id),
+    user_id INT REFERENCES users(user_id) UNIQUE,
+    stage_name VARCHAR (50),
     bio VARCHAR(250),
     social_media_links VARCHAR(250)
 );
