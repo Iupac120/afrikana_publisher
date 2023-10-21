@@ -134,11 +134,11 @@ const updateUserEmail = async (req,res) => {
     return res.status(200).json("User updated successfully")
 }
 //digital market place
-const createArtist = async (req,res) => {
+const createArtist = async (req,res,next) => {
     const userId = req.user.id;
     const {name,bio,socialLink} = req.body;
     const artistExist = await pool.query("SELECT user_id FROM artist WHERE user_id = $1",[userId]);
-    if(artist.rows.length) return next(new UnAuthorizedError("You have alreday created an artist account"))
+    if(artistExist.rows.length) return next(new UnAuthorizedError("You have alreaDy created an artist account"))
     const artist = await pool.query("INSERT INTO artist (user_id,bio,social_media_links,stage_name) VALUES ($1,$2,$3,$4) RETURNING stage_name",[userId,bio,socialLink,name]);
     if(!artist.rows.length) return next(new NotFoundError("Failed to create artist"))
     const newArtist = await pool.query("SELECT artist.stage_name,artist.bio,artist.social_media_links,user_profiles.avatar_url FROM artist JOIN user_profiles ON artist.user_id = user_profiles.user_id WHERE artist.user_id = $1",[userId])
@@ -148,6 +148,17 @@ const createArtist = async (req,res) => {
     data: newArtist.rows[0]    
     })
 }
+
+// vendor account
+ const createVendorAccount = async (req,res) => {
+    const userId = req.user.id;
+    const {accName,accNo,bank} = req.body;
+    const vendorAcc = await pool.query("INSERT INTO vendor_account (user_id,account_name,account_number,bank) VALUES ($1,$2,$3,$4) RETURNING account_name",[userId,accName,accNo,bank]);
+    if(!vendorAcc.rows.length) return next(new NotFoundError("Failed to create vendor account"))
+    res.status(201).json({data:vendorAcc.rows[0]}) 
+ }
+
+
 //artist dashboard
 const createEarning = async (req,res) => {
     const userId = req.user.id;
@@ -198,6 +209,7 @@ export default {
     updateUserPassword,
     updateUserEmail,
     createArtist,
+    createVendorAccount,
     createEarning,
     getEarning
 }

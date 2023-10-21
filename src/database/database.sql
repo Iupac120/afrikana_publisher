@@ -31,7 +31,7 @@ CREATE TABLE user_profiles (
 );
 CREATE TABLE category (
     category_id SERIAL PRIMARY KEY,
-    category_name VARCHAR (100) NOT NULL,
+    category_name VARCHAR (100) UNIQUE NOT NULL,
     created_by INT REFERENCES users (user_id) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -41,11 +41,11 @@ CREATE TABLE category (
 CREATE TABLE sub_category (
     sub_category_id SERIAL PRIMARY KEY,
     category_id INT REFERENCES category(category_id),
-    dimension_id INT REFERENCES dimension(dimension_id)
-    product_id INT REFERENCES product(product_id)
+    dimension_id INT REFERENCES dimension(dimension_id),
+    product_id INT REFERENCES product(product_id),
     quantity_stock INT,
     minimum_stock INT,
-    maximum_stock INT,
+    maximum_stock INT
 );
 -- ProductListing Table
 CREATE TABLE product (
@@ -63,16 +63,16 @@ CREATE TABLE product (
 -- Dimension table
 CREATE TABLE dimension (
     dimension_id SERIAL PRIMARY KEY,
-    product_id INT REFERENCES product (product_id),
+    sub_category_id INT REFERENCES sub_category (sub_category_id),
     dimension INT,
     unit INT NOT NULL
 );
-CREATE TABLE account_info (
-    account_info_id SERIAL PRIMARY KEY,
+CREATE TABLE vendor_account (
+    vendor_account_id SERIAL PRIMARY KEY,
     user_id INT REFERENCES users(user_id),
     account_name VARCHAR(250) NOT NULL,
     account_number INT NOT NULL,
-    bank VARCHAR(50)
+    bank VARCHAR(50) NOT NULL
 );
 
 

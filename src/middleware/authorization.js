@@ -16,7 +16,8 @@ function authenticateUser (req,res,next) {
     })
 }
 function authenticateAdmin (req,res,next){
-    return (authenticateUser,(req,res,next) => {
+    return authenticateUser(req,res, () => {
+        console.log("here",req.user)
         if(req.user.admin){
             console.log("admin",req.user.admin)
             return next()

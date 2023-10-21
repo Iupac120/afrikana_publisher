@@ -65,7 +65,7 @@ const resetOtpVerify = async (req,res,next) => {
 
 const userLogin = async(req,res) => {
         const {email,password} = req.body
-        const user = await pool.query("SELECT user_id,user_name,user_email,user_password,is_verified FROM users WHERE user_email = $1",[email])
+        const user = await pool.query("SELECT user_id,user_name,user_email,user_password,is_verified,is_admin FROM users WHERE user_email = $1",[email])
         if(user.rows.length === 0) return res.status(401).json({error:"email not found, please sign up"})
         const {user_password,is_verified} = user.rows[0]
         if(!is_verified) return next(new UnAuthorizedError("Your account has not been verified"))
