@@ -31,40 +31,90 @@ const getSubCollection = async(req,res,next) => {
 
 const getSpecificArtWorkDetails = async (req,res,next) => {
     const {artworkId} = req.params;
-    const art = await pool.query("SELECT sub_category.sub_category_name,product.product_title,product.exclusivity_status,product.price,product_description,dimension.dimension,dimension.unit FROM product LEFT JOIN sub_category ON WHERE product.product_id = sub_category.product_id LEFT JOIN ON WHERE sub_category.sub_category_id = dimension.sub_category_id WHERE product.product_id = $1",[artworkId]);
+    const art = await pool.query("SELECT sub_category.sub_category_name,product.product_title,product.exclusivity_status,product.price,product_description,dimension.dimension,dimension.unit FROM product LEFT JOIN sub_category ON product.product_id = sub_category.product_id LEFT JOIN dimension ON sub_category.sub_category_id = dimension.sub_category_id WHERE product.product_id = $1",[artworkId]);
     if(!art.rows.length) return next(new NotFoundError("Artwork not available"));
     res.status(200).json({data:art.rows})
 }
 
-const filterArtwork = async (req,res,next) => {
-    const {catName,title,price,unit,dimension} = req.query;
+const filterArtwork = async (req, res, next) => {
+    const { catName, title, price, unit, dimension } = req.query;
     const obj = {};
-    if(category){
-        await pool.query("SELECT category.category_name, product.product_title, product.price FROM category LEFT JOIN product ON WHERE category.category_id = product.category_id WHERE category_name LIKE '%$1' IN category.category_name",[catName])
+
+    if (catName) {
+        const catResults = await pool.query(
+            "SELECT category.category_name, product.product_title, product.price FROM category " +
+            "LEFT JOIN product ON category.category_id = product.category_id " +
+            "WHERE category_name LIKE $1",
+            [`%${catName}%`]
+        );
+        obj.catNameResults = catResults.rows;
     }
-    if(title){
-        await pool.query("SELECT product.product_title, product.price,product.product_description, artist.stage_name FROM artist LEFT JOIN product ON WHERE artist.artist_id = product.artist_id WHERE product.product_title LIKE '%$1' IN product.product_title",[title])
+
+    if (title) {
+        const titleResults = await pool.query(
+            "SELECT product.product_title, product.price, product.product_description, artist.stage_name FROM artist " +
+            "LEFT JOIN product ON artist.artist_id = product.artist_id " +
+            "WHERE product_title LIKE $1",
+            [`%${title}%`]
+        );
+        obj.titleResults = titleResults.rows;
     }
-    if(price){
-        await pool.query("SELECT product.product_title, product.price,product.product_description, artist.stage_name FROM artist LEFT JOIN product ON WHERE artist.artist_id = product.artist_id WHERE product.price BETWEEN 0 AND $1 IN product.price",[price])
+
+    if (price) {
+        const priceResults = await pool.query(
+            "SELECT product.product_title, product.price, product.product_description, artist.stage_name FROM artist " +
+            "LEFT JOIN product ON artist.artist_id = product.artist_id " +
+            "WHERE product.price BETWEEN 0 AND $1",
+            [price]
+        );
+        obj.priceResults = priceResults.rows;
     }
-    if(unit || dimension){
-        await pool.query("SELECT product.product_title, product.price,product.product_description, artist.stage_name FROM artist LEFT JOIN product ON WHERE artist.artist_id = product.artist_id LEFT JOIN sub_category ON WHERE product.product_id = sub_category.product_id LEFT JOIN ON dimension ON WHERE sub_category.sub_category_id = dimension.sub_category_id WHERE dimension.dimension = $1 OR dimension.unit",[unit,dimension])
+
+    if (unit || dimension) {
+        const dimensionResults = await pool.query(
+            "SELECT product.product_title, product.price, product.product_description, artist.stage_name FROM artist " +
+            "LEFT JOIN product ON artist.artist_id = product.artist_id " +
+            "LEFT JOIN sub_category ON product.product_id = sub_category.product_id " +
+            "LEFT JOIN dimension ON sub_category.sub_category_id = dimension.sub_category_id " +
+            "WHERE dimension.dimension = $1 OR dimension.unit = $2",
+            [unit, dimension]
+        );
+        obj.dimensionResults = dimensionResults.rows;
     }
-    res.status(200).json({data:obj})
+
+    res.status(200).json({ data: obj });
 }
 
-const sortArtwork = async(req,res,next) => {
-    const {price,popularity} = req.query
-    const obj = {}
-    if(price){
-        await pool.query("SELECT product.product_title, product.price,product.product_description, artist.stage_name FROM artist LEFT JOIN product ON WHERE artist.artist_id = product.artist_id ORDER BY product.price BETWEEN 0 AND $1",[price])
+
+const sortArtwork = async (req, res, next) => {
+    const { price, popularity } = req.query;
+    const obj = {};
+
+    if (price) {
+        const priceResults = await pool.query(
+            "SELECT product.product_title, product.price, product.product_description, artist.stage_name " +
+            "FROM artist " +
+            "LEFT JOIN product ON artist.artist_id = product.artist_id " +
+            "WHERE product.price BETWEEN 0 AND $1 " +
+            "ORDER BY product.price",
+            [price]
+        );
+        obj.priceResults = priceResults.rows;
     }
-    if(popularity){
-        await pool.query("SELECT product.product_title, product.price,product.product_description, artist.stage_name FROM artist LEFT JOIN product ON WHERE artist.artist_id = product.artist_id ORDER BY product.exclusivity_status")
+
+    if (popularity) {
+        const popularityResults = await pool.query(
+            "SELECT product.product_title, product.price, product.product_description, artist.stage_name " +
+            "FROM artist " +
+            "LEFT JOIN product ON artist.artist_id = product.artist_id " +
+            "ORDER BY product.exclusivity_status"
+        );
+        obj.popularityResults = popularityResults.rows;
     }
-    res.status(200).json({data:obj})
+
+    res.status(200).json({ data: obj });
 }
+
 
 export default {
     getArtWorks,
