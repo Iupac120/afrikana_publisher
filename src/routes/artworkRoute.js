@@ -8,7 +8,7 @@ router.get("/", trycatchHandler(artworkContoller.getArtWorks))
 router.get("/collections", trycatchHandler(artworkContoller.getCollection))
 router.get("/filter", trycatchHandler(artworkContoller.filterArtwork))
 router.get("/sort", trycatchHandler(artworkContoller.sortArtwork))
-router.get("/:colId/sub-collection", trycatchHandler(artworkContoller.getSpecificArtWork))
+router.get("/:colId/sub-collection", trycatchHandler(artworkContoller.getSubCollection))
 router.get("/:artworkId", trycatchHandler(artworkContoller.getSpecificArtWork))
 router.get("/:artworkId/details", trycatchHandler(artworkContoller.getSpecificArtWorkDetails))
 export {router}
