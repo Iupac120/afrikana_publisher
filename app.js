@@ -15,6 +15,7 @@ import {router as userRoute} from "./src/routes/userRoute.js"
 import {router as authRoute} from "./src/routes/registerRoute.js"
 import {router as productRoute} from "./src/routes/productRoute.js"
 import {router as artworkRoute} from "./src/routes/artworkRoute.js"
+import {router as cartRoute} from "./src/routes/cartRoute.js"
 import { notFound } from "./src/errors/NotFoundError.js"
 import { errorHandler } from "./src/errors/errorHandler.js"
 import pool from "./src/database/db.js"
@@ -46,6 +47,7 @@ app.use("/api/user", userRoute)
 app.use("/api/register", authRoute)
 app.use("/api/product", productRoute)
 app.use("/api/artwork", artworkRoute)
+app.use("/api/cart", cartRoute)
 
 
 app.use(notFound)
