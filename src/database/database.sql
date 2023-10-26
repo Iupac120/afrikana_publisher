@@ -60,11 +60,17 @@ CREATE TABLE product (
     created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
-CREATE TABLE shopping_cart_product (
+CREATE TABLE cart_item (
+    cart_item_id SERIAL PRIMARY KEY,
     product_id INT REFERENCES product (product_id),
     cart_id INT REFERENCES cart(cart_id),
-    product_quantity DOUBLE PRECISION NOT NULL,
-    product_price NUMERIC(9,5) NOT NULL,
+    product_quantity INT NOT NULL,
+    product_price NUMERIC NOT NULL,
+    discount NUMERIC(3,2),
+    cart_subtotal NUMERIC(9,4) NOT NULL,
+    cart_total NUMERIC(9,4) NOT NULL,
+    cart_tax NUMERIC(3,2) NOT NULL,
+    cart_shipping_cost NUMERIC(3,2) NOT NULL,
     created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -72,12 +78,12 @@ CREATE TABLE shopping_cart_product (
 
 CREATE TABLE cart (
     cart_id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES users (user_id),
+    session_id VARCHAR(100),
+    total NUMERIC(9,2),
     cart_date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    cart_date_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    cart_subtotal NUMERIC (9,4) NOT NULL,
-    cart_total NUMERIC(9,4) NOT NULL,
-    cart_tax NUMERIC(9,4) NOT NULL,
-    cart_shipping_cost NUMERIC(9,4) NOT NULL,
+    cart_date_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    
 );
 -- Dimension table
 CREATE TABLE dimension (
