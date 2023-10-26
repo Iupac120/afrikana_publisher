@@ -40,8 +40,8 @@ CREATE TABLE category (
 --sub category
 CREATE TABLE sub_category (
     sub_category_id SERIAL PRIMARY KEY,
+    sub_category_name VARCHAR(20) UNIQUE NOT NULL,
     category_id INT REFERENCES category(category_id),
-    dimension_id INT REFERENCES dimension(dimension_id),
     product_id INT REFERENCES product(product_id),
     quantity_stock INT,
     minimum_stock INT,
@@ -60,6 +60,25 @@ CREATE TABLE product (
     created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+CREATE TABLE shopping_cart_product (
+    product_id INT REFERENCES product (product_id),
+    cart_id INT REFERENCES cart(cart_id),
+    product_quantity DOUBLE PRECISION NOT NULL,
+    product_price NUMERIC(9,5) NOT NULL,
+    created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+
+CREATE TABLE cart (
+    cart_id SERIAL PRIMARY KEY,
+    cart_date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    cart_date_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    cart_subtotal NUMERIC (9,4) NOT NULL,
+    cart_total NUMERIC(9,4) NOT NULL,
+    cart_tax NUMERIC(9,4) NOT NULL,
+    cart_shipping_cost NUMERIC(9,4) NOT NULL,
+);
 -- Dimension table
 CREATE TABLE dimension (
     dimension_id SERIAL PRIMARY KEY,
@@ -71,11 +90,9 @@ CREATE TABLE vendor_account (
     vendor_account_id SERIAL PRIMARY KEY,
     user_id INT REFERENCES users(user_id),
     account_name VARCHAR(250) NOT NULL,
-    account_number INT NOT NULL,
+    account_number VARCHAR(20) NOT NULL,
     bank VARCHAR(50) NOT NULL
 );
-
-
 
 -- Digital Marketplace
 CREATE TABLE artist (
@@ -85,6 +102,10 @@ CREATE TABLE artist (
     bio VARCHAR(250),
     social_media_links VARCHAR(250) NOT NULL
 );
+
+
+
+
 
 -- CREATE TABLE social_media (
 --     social_media_id SERIAL PRIMARY KEY,
@@ -132,16 +153,8 @@ CREATE TABLE subscriptions (
 
 
 
-CREATE TABLE product_listings (
-    listing_id SERIAL PRIMARY KEY,
-    artist_id INT,
-    -- Add fields for product details
-);
 
-CREATE TABLE vendor_accounts (
-    user_id INT PRIMARY KEY,
-    bank_details TEXT
-);
+
 
 CREATE TABLE orders (
     order_id SERIAL PRIMARY KEY,
@@ -182,15 +195,7 @@ CREATE TABLE artworks (
     -- Add fields for artwork details
 );
 
-CREATE TABLE collections (
-    collection_id SERIAL PRIMARY KEY,
-    -- Add fields for collection details
-);
 
-CREATE TABLE sub_collections (
-    sub_collection_id SERIAL PRIMARY KEY,
-    -- Add fields for sub-collection details
-);
 
 -- Add tables for shopping cart, checkout, order tracking, reviews, and more as needed.
 CREATE TABLE shopping_cart (
@@ -200,14 +205,6 @@ CREATE TABLE shopping_cart (
     -- Add any other relevant fields
 );
 
-CREATE TABLE cart_items (
-    item_id SERIAL PRIMARY KEY,
-    cart_id INT,
-    product_id INT,
-    quantity INT,
-    price DECIMAL,
-    -- Add any other relevant fields
-);
 
 CREATE TABLE checkout (
     checkout_id SERIAL PRIMARY KEY,
