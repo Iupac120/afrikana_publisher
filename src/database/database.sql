@@ -55,6 +55,7 @@ CREATE TABLE product (
     product_description VARCHAR(100),
     category_id INT REFERENCES category (category_id),
     price INT NOT NULL,
+    discount NUMERIC(3,2),
     exclusivity_status BOOLEAN DEFAULT FALSE,
     keywords VARCHAR(50),
     created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -65,12 +66,6 @@ CREATE TABLE cart_item (
     product_id INT REFERENCES product (product_id),
     cart_id INT REFERENCES cart(cart_id),
     product_quantity INT NOT NULL,
-    product_price NUMERIC NOT NULL,
-    discount NUMERIC(3,2),
-    cart_subtotal NUMERIC(9,4) NOT NULL,
-    cart_total NUMERIC(9,4) NOT NULL,
-    cart_tax NUMERIC(3,2) NOT NULL,
-    cart_shipping_cost NUMERIC(3,2) NOT NULL,
     created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -80,7 +75,10 @@ CREATE TABLE cart (
     cart_id SERIAL PRIMARY KEY,
     user_id INT REFERENCES users (user_id),
     session_id VARCHAR(100),
-    total NUMERIC(9,2),
+    cart_subtotal NUMERIC(9,4) NOT NULL,
+    cart_total NUMERIC(9,4) NOT NULL,
+    cart_tax NUMERIC(3,2) NOT NULL,
+    cart_shipping_cost NUMERIC(3,2) NOT NULL,
     cart_date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     cart_date_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     
