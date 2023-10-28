@@ -6,6 +6,9 @@ const addCart = async (req,res,next) =>{
   const userId = req.user.id; // User's ID after authentication
     // Get the user's cart ID based on the user ID
     const userCart = await pool.query('SELECT cart_id FROM cart WHERE user_id = $1', [userId]);
+    if(!userCart.rows.length){
+      const userCart =await pool.query("INSERT INTO cart (user_id) VALUES ($1) RETURNING user_id",[userId])
+    }
     const cartId = userCart.rows[0].cart_id;
 
     // Check if the product already exists in the cart

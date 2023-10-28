@@ -73,6 +73,8 @@ const userLogin = async(req,res) => {
         if(!isMatch) return res.status(401).json({error:"Incorrect password"})
         let token = jwtToken(user.rows[0]);
     console.log("user",user.rows[0])
+        req.session.user = user
+        console.log("session",req.session.user.rows[0])
     //httpOnly: true, sameSite:"none", secure: true
         res.cookie("refresh_token",token.refreshToken,{httpOnly: true})
         res.status(201).json({"accessToken":token.accessToken,"refreshToken":token.refreshToken})
