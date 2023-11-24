@@ -54,7 +54,7 @@ const addCart = async (req,res,next) =>{
 
     // Update the cart totals in the cart table
     const tax = 0; // Calculate tax if needed
-    const shippingCost = 0; // Calculate shipping cost if needed
+    const shippingCost = 0; // C alculate shipping cost if needed
     const cartTotal = cartSubtotal + tax + shippingCost;
 
     await pool.query(
@@ -67,7 +67,12 @@ const addCart = async (req,res,next) =>{
 }
 
 const getCart = async (req,res,next) => {
-
+  const userId = req.user.id
+  const cart = await pool.query("SELECT FROM cart WHERE user_id = $1",[userId]);
+  if (!cart.length){
+    return res.json("Your cart is empty")
+  } 
+  res.staus(200).json({data:cart.rows})
 }
 
 export default {
