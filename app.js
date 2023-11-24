@@ -9,6 +9,7 @@ import passport from "passport";
 import "./src/utils/passport.js"
 import cookieSession from "cookie-session";
 import expressSession from 'express-session';
+import pgSession from "connect-pg-simple";
 import {dirname, join} from "path"
 import { fileURLToPath } from "url"
 import {router as userRoute} from "./src/routes/userRoute.js"
@@ -31,6 +32,9 @@ app.use(express.static('public'))
 app.use(morgan())
 app.use(
     expressSession({
+        // store:new (pgSession(expressSession))({
+        //     pool:pool
+        // }),
         secret:"mySecret",
         resave: false,
         saveUninitialized: true,

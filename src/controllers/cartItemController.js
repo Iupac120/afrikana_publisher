@@ -4,11 +4,10 @@ import pool from "../database/db.js";
 const addCart = async (req,res,next) =>{
   const { productId} = req.params;
   const userId = req.user.id; // User's ID after authentication
+  //create cart if does not exist
+  await pool.query("INSERT INTO cart (user_id) VALUES ($1) ON CONFLICT (user_id) DO NOTHING",[userId])
     // Get the user's cart ID based on the user ID
     const userCart = await pool.query('SELECT cart_id FROM cart WHERE user_id = $1', [userId]);
-    if(!userCart.rows.length){
-      const userCart =await pool.query("INSERT INTO cart (user_id) VALUES ($1) RETURNING user_id",[userId])
-    }
     const cartId = userCart.rows[0].cart_id;
 
     // Check if the product already exists in the cart
@@ -45,7 +44,7 @@ const addCart = async (req,res,next) =>{
 
       // Calculate item subtotal and update the cart_item record
       const subtotal = productPrice * cartItem.product_quantity;
-      await pool.query('UPDATE cart_item SET product_subtotal = $1 WHERE cart_item_id = $2', [subtotal, cartItem.cart_item_id]);
+      await pool.query('UPDATE cart SET cart_subtotal = $1 WHERE cart_item_id = $2', [subtotal, cartItem.cart_item_id]);
 
       // Add the item subtotal to the cart subtotal
       cartSubtotal += subtotal;
