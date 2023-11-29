@@ -143,9 +143,24 @@ const deleteCart = async (req,res,next) => {
   // Add the item subtotal to the cart subtotal
   cartSubtotal += subtotal
 }
+
+const cartTotal = async(req,res,next) => {
+  const userId = req.user.id
+  const userCart = await pool.query("SELECT FROM cart WHERE user_id = $1",[userId])
+  const product = await pool.query('SELECT price FROM product WHERE product_id = $1', [cartItem.product_id]);
+      const productPrice = product.rows[0].price;
+
+      // Calculate item subtotal and update the cart_item record
+      const subtotal = productPrice * cartItem.product_quantity;
+      await pool.query('UPDATE cart SET cart_subtotal = $1 WHERE cart_item_id = $2', [subtotal, cartItem.cart_item_id]);
+
+      // Add the item subtotal to the cart subtotal
+      cartSubtotal += subtotal;
+}
 export default {
     addCart,
     getCart,
     updateCart,
-    deleteCart
+    deleteCart,
+    cartTotal
 }
