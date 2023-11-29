@@ -1,4 +1,5 @@
 import pool from "../database/db.js";
+import { NotFoundError } from "../errors/customError.js";
 
 
 const addCart = async (req,res,next) =>{
@@ -125,8 +126,26 @@ const updateCart = async(req,res,next) => {
     res.json({ success: true, message: 'Item added to cart' });
 
 }
+
+const deleteCart = async (req,res,next) => {
+  const userId = req.user.id
+  const {productId} = req.params
+  const userCart = await pool.query("SELECT FROM cart WHERE user_id = $1",[userId])
+  if(!userCart.rows.length) return next(new NotFoundError("user cart not found"))
+  const cartId = await pool.query("DELETE FROM cart_item WHERE product_id = $1",[productId])
+  const product = await pool.query('SELECT price FROM product WHERE product_id = $1', [cartItem.product_id]);
+  const productPrice = product.rows[0].price;
+
+  // Calculate item subtotal and update the cart_item record
+  const subtotal = productPrice * cartItem.product_quantity;
+  await pool.query('UPDATE cart SET cart_subtotal = $1 WHERE cart_item_id = $2', [subtotal, cartItem.cart_item_id]);
+
+  // Add the item subtotal to the cart subtotal
+  cartSubtotal += subtotal
+}
 export default {
     addCart,
     getCart,
-    updateCart
+    updateCart,
+    deleteCart
 }
