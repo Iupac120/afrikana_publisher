@@ -85,21 +85,11 @@ const updateCart = async(req,res,next) => {
       'SELECT * FROM cart_item WHERE cart_id = $1 AND product_id = $2',
       [cartId, productId]
     );
-
-    if (existingCartItem.rows.length > 0) {
       // Update the quantity of the existing cart item
       await pool.query(
         'UPDATE cart_item SET product_quantity = $1 WHERE cart_item_id = $2',
         [existingCartItem.rows[0].product_quantity + 1, existingCartItem.rows[0].cart_item_id]
       );
-    } else {
-      // Insert a new cart item
-      await pool.query(
-        'INSERT INTO cart_item (cart_id, product_id, product_quantity) VALUES ($1, $2, $3)',
-        [cartId, productId, 1]
-      );
-    }
-
     // Calculate and update cart totals here
     // Fetch all cart items for the specified cart
     const cartItems = await pool.query('SELECT * FROM cart_item WHERE cart_id = $1', [cartId]);
