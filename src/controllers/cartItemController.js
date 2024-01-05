@@ -108,61 +108,35 @@ console.log("cartId",cart_id)
   res.status(200).json({data:newCart.rows})
 }
 
-// const deleteCart = async (req, res, next) => {
-//   const userId = req.user.id;
-//   const { productId } = req.params;
 
-//   try {
-//     const userCart = await pool.query("SELECT cart_id FROM cart WHERE user_id = $1", [userId]);
 
-//     if (!userCart.rows.length) {
-//       return next(new NotFoundError("User cart not found"));
-//     }
+const cartTotal = async (req, res, next) => {
+  const userId = req.user.id;
+  const product = await pool.query('SELECT cart_item.product_id, cart_item.product_quantity, product.product_title, product.price,product.discount FROM cart LEFT JOIN cart_item ON cart.cart_id = cart_item.cart_id LEFT JOIN product ON cart_item.product_id = product.product_id WHERE user_id = $1', [userId]);
+  
+  const productRows = product.rows;
+  let cartSubtotal = 0;
 
-//     const { cart_id } = userCart.rows[0];
+  for (const prod of productRows) {
+    const { product_title, price, product_quantity, discount } = prod;
 
-//     console.log("cartId", cart_id);
+    // Convert discount to a number
+    const discountValue = parseFloat(discount);
 
-//     const updatedCartItem = await pool.query(
-//       "UPDATE cart_item SET product_quantity = product_quantity - 1 WHERE product_id = $1 AND cart_id = $2 RETURNING *",
-//       [productId, cart_id]
-//     );
-
-//     console.log("cartItem", updatedCartItem.rows[0]);
-
-//     const product = await pool.query('SELECT price FROM product WHERE product_id = $1', [productId]);
-//     const productPrice = product.rows[0].price;
-
-//     // Calculate item subtotal and update the cart_item record
-//     const subtotal = productPrice * updatedCartItem.rows[0].product_quantity;
-
-//     await pool.query('UPDATE cart SET cart_subtotal = cart_subtotal - $1 WHERE cart_id = $2', [subtotal, cart_id]);
-
-//     // Add the item subtotal to the cart subtotal (if needed)
-//     // cartSubtotal += subtotal;
-
-//     // ... additional logic if necessary
-
-//     res.status(204).json(); // Assuming a successful update with no content in response
-//   } catch (error) {
-//     console.error("Error deleting from cart:", error);
-//     return next(new InternalServerError("Internal Server Error"));
-//   }
-// };
-
-const cartTotal = async(req,res,next) => {
-  const userId = req.user.id
-  const userCart = await pool.query("SELECT FROM cart WHERE user_id = $1",[userId])
-  const product = await pool.query('SELECT price FROM product WHERE product_id = $1', [cartItem.product_id]);
-      const productPrice = product.rows[0].price;
-
-      // Calculate item subtotal and update the cart_item record
-      const subtotal = productPrice * cartItem.product_quantity;
-      await pool.query('UPDATE cart SET cart_subtotal = $1 WHERE cart_item_id = $2', [subtotal, cartItem.cart_item_id]);
-
-      // Add the item subtotal to the cart subtotal
+    if (isNaN(discountValue) || discountValue === null) {
+      const subtotal = price * product_quantity;
       cartSubtotal += subtotal;
-}
+    } else {
+      const subtotal = price * product_quantity * (discountValue * 0.01);
+      cartSubtotal += subtotal;
+    }
+  }
+
+  console.log(cartSubtotal);
+  res.status(201).json({ data: cartSubtotal });
+};
+
+
 export default {
     addCart,
     getCart,
