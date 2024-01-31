@@ -156,13 +156,20 @@ CREATE TABLE subscriptions (
 
 
 
-
-
-
 CREATE TABLE orders (
     order_id SERIAL PRIMARY KEY,
-    order_status TEXT
+    user_id INT REFERENCES users(user_id) NOT NULL,
+    order_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    total_amount DECIMAL(10, 2) NOT NULL,
+    status VARCHAR(20) NOT NULL,
+    payment_id VARCHAR(100) NOT NULL,
+    payment_status VARCHAR(20) NOT NULL,
+    shipping_address TEXT NOT NULL,
+    payment_method VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP
 );
+
 
 CREATE TABLE smart_contracts (
     contract_id SERIAL PRIMARY KEY,
