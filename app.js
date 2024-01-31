@@ -24,7 +24,7 @@ import pool from "./src/database/db.js"
 const _dirname  = dirname(fileURLToPath(import.meta.url))
 app.use(express.json())
 const corsOptions = {
-    origin: ["http://localhost:3000", "https://findmyloop.com"], 
+    origin: ["http://localhost:3000", `${process.env.LIENT_URL}`], 
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', 
     credentials: true,
     allowedHeaders: "Content-Type,Authorization"

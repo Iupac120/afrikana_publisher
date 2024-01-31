@@ -1,5 +1,6 @@
 import express from "express"
 const router = express.Router()
+import dotenv from "dotenv";
 import Stripe from "stripe";
 import { UnAuthorizedError } from "../errors/customError.js";
 import pool from "../database/db.js";
@@ -7,27 +8,27 @@ import { authenticateUser } from "../middleware/authorization.js";
 const stripe = Stripe(process.env.STRIPE)
 
 //checkout route
-// router.get("/checkout",authenticateUser,(req,res) =>{
-//     try{
-//     if(!req.session.cart){
-//         throw new UnAuthorizedError("Access denied")
-//     }
-//     const cart = new Cart(req.session.cart)
-//     res.status(201).json({total:cart.totalPrice})
-//     }catch(err){
-//         res.status(500).json(err)
-//     }
-// })
+router.get("/checkout",authenticateUser,(req,res) =>{
+    try{
+    // if(!req.session.cart){
+    //     throw new UnAuthorizedError("Access denied")
+    // }
+    // const cart = new Cart(req.session.cart)
+    res.status(201).json('cart')
+    }catch(err){
+        res.status(500).json(err)
+    }
+})
 //payment route
 router.post("/checkout",authenticateUser, async(req,res) =>{
     const userId = req.user.id;
     // if(!req.session.cart){
     //     throw new UnAuthorizedError("Access denied")
     // }
+    console.log("payment")
     const { cartId, token, user_address } = req.body;
-    const totalPriceQuery = 'SELECT total_price FROM carts WHERE id = $1';
-    const { rows } = await pool.query(totalPriceQuery, [cartId]);
-    const totalPrice = rows[0].total_price;
+    const totalPriceQuery = await pool.query('SELECT cart_total FROM cart WHERE id = $1', [cartId]);
+    const totalPrice = totalPriceQuery.rows[0];
         stripe.charges.create({
             amount: totalPrice * 100, // Convert to cents
             currency: 'usd',
