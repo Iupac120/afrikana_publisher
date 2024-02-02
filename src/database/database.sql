@@ -243,53 +243,104 @@ CREATE TABLE artwork_reviews (
     -- Add any other relevant fields
 );
 
-
--- Multi-media Gallery
+-- Texts Table
 CREATE TABLE texts (
     text_id SERIAL PRIMARY KEY,
-    content TEXT,
-    likes INT,
-    comments TEXT,
-    user_mentions TEXT,
-    emoji_gif TEXT
+    content TEXT NOT NULL,
+    formatting TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+
+
+-- Likes Table
+CREATE TABLE likes (
+    like_id SERIAL PRIMARY KEY,
+    text_id INTEGER REFERENCES texts(text_id),
+    user_id INTEGER REFERENCES users(user_id),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Comments Table
+CREATE TABLE comments (
+    comment_id SERIAL PRIMARY KEY,
+    text_id INTEGER REFERENCES texts(text_id),
+    user_id INTEGER REFERENCES users(user_id),
+    comment_text TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- User Mentions Table
+CREATE TABLE user_mentions (
+    mention_id SERIAL PRIMARY KEY,
+    comment_id INTEGER REFERENCES comments(comment_id),
+    mentioned_user_id INTEGER REFERENCES users(user_id)
+);
+
+-- Emoji-GIF Table
+CREATE TABLE emoji_gif (
+    emoji_gif_id SERIAL PRIMARY KEY,
+    text_id INTEGER REFERENCES texts(text_id),
+    url TEXT NOT NULL
+);
+
+-- Reports Table
+CREATE TABLE reports (
+    report_id SERIAL PRIMARY KEY,
+    text_id INTEGER REFERENCES texts(text_id),
+    user_id INTEGER REFERENCES users(user_id),
+    report_reason TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Chat Rooms Table
 CREATE TABLE chat_rooms (
     room_id SERIAL PRIMARY KEY,
-    room_details TEXT
+    room_name VARCHAR(100) UNIQUE NOT NULL,
+    created_by INTEGER REFERENCES users(user_id),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE chat_messages (
+-- Messages Table
+CREATE TABLE messages (
     message_id SERIAL PRIMARY KEY,
-    room_id INT,
-    user_id INT,
-    message_text TEXT
+    room_id INTEGER REFERENCES chat_rooms(room_id),
+    user_id INTEGER REFERENCES users(user_id),
+    message_text TEXT NOT NULL,
+    sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Add tables for content upload, recommendations, categorization, and more as needed.
-CREATE TABLE content_upload (
+-- Content Table
+CREATE TABLE content (
     content_id SERIAL PRIMARY KEY,
-    user_id INT,
-    content_type VARCHAR(50),
-    upload_date TIMESTAMP,
-    file_url TEXT,
-    -- Add any other relevant fields
+    type VARCHAR(50) NOT NULL,
+    file_path TEXT NOT NULL,
+    upload_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE content_recommendations (
+-- Recommendations Table
+CREATE TABLE recommendations (
     recommendation_id SERIAL PRIMARY KEY,
-    user_id INT,
-    recommended_content_id INT,
-    recommendation_date TIMESTAMP,
-    -- Add any other relevant fields
+    content_id INTEGER REFERENCES content(content_id),
+    recommended_to INTEGER REFERENCES users(user_id),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE content_categorization (
+-- Shares Table
+CREATE TABLE shares (
+    share_id SERIAL PRIMARY KEY,
+    content_id INTEGER REFERENCES content(content_id),
+    sharer_id INTEGER REFERENCES users(user_id),
+    referral_link TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Categorization Table
+CREATE TABLE categorization (
     categorization_id SERIAL PRIMARY KEY,
-    content_id INT,
-    collection_id INT,
-    sub_collection_id INT,
-    -- Add any other relevant fields
+    content_id INTEGER REFERENCES content(content_id),
+    category VARCHAR(100) NOT NULL,
+    subcategory VARCHAR(100)
 );
 
 -- IAA Plugin
