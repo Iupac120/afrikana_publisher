@@ -246,19 +246,19 @@ CREATE TABLE artwork_reviews (
 -- Texts Table
 CREATE TABLE texts (
     text_id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(user_id),
     content TEXT NOT NULL,
     formatting TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 
-
--- Likes Table
 CREATE TABLE likes (
     like_id SERIAL PRIMARY KEY,
     text_id INTEGER REFERENCES texts(text_id),
     user_id INTEGER REFERENCES users(user_id),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(text_id, user_id) 
 );
 
 -- Comments Table

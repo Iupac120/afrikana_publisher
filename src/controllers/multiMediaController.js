@@ -3,6 +3,7 @@ import { NotFoundError } from "../errors/customError.js";
 
 const createText = async (req, res) => {
     const { content, formatting } = req.body;
+    const userId = req.user.id
       const client = await pool.connect();
       // Check if the text already exists in the database based on some unique identifier
       const existingTextQuery = 'SELECT * FROM texts WHERE content = $1';
@@ -14,8 +15,8 @@ const createText = async (req, res) => {
         res.status(200).json({ message: 'Text updated successfully' });
       } else {
         // If the text doesn't exist, create a new entry
-        const insertTextQuery = 'INSERT INTO texts (content, formatting) VALUES ($1, $2)';
-        await client.query(insertTextQuery, [content, formatting]);
+        const insertTextQuery = 'INSERT INTO texts (content, formatting,user_id) VALUES ($1, $2, $3)';
+        await client.query(insertTextQuery, [content, formatting, userId]);
         res.status(201).json({ message: 'Text created successfully' });
       }
       client.release();
@@ -40,30 +41,33 @@ const createText = async (req, res) => {
   };
   
   const createLikeText =  async (req, res) => {
+    console.log("here")
+    const userId = req.user.id
+    console.log("id",userId)
     const textId = req.params.text_id;
-
-      const client = await pool.connect();
-  
-      // Check if the text exists
-      const textQuery = 'SELECT * FROM texts WHERE text_id = $1';
-      const textResult = await client.query(textQuery, [textId]);
-  
-      if (textResult.rows.length === 0) {
-        res.status(404).json({ error: 'Text not found' });
+        const client = await pool.connect();
+        // Check if the user has already liked the text
+        console.log("here1")
+        const checkLikeQuery = 'SELECT * FROM likes WHERE text_id = $1 AND user_id = $2';
+        const checkLikeResult = await client.query(checkLikeQuery, [textId, userId]);
+        if (checkLikeResult.rows.length > 0) {
+          // User has already liked the text
+          res.status(200).json({ success: false, message: 'You have already liked this text' });
+        }
+        console.log("here2")
+        // If the user hasn't liked the text, insert a new like
+        const likeQuery = 'INSERT INTO likes (text_id, user_id) VALUES ($1, $2)';
+        await client.query(likeQuery, [textId, userId]);
+        // Increment the like count in the texts table
+        console.log("here3")
+        const updateLikesQuery = 'UPDATE texts SET likes = likes + 1 WHERE text_id = $1';
+        await client.query(updateLikesQuery, [textId]);
         client.release();
-        return;
-      }
-  
-      // Update the likes count for the text
-      const updateLikesQuery = 'UPDATE texts SET likes = likes + 1 WHERE text_id = $1';
-      await client.query(updateLikesQuery, [textId]);
-  
-      res.status(200).json({ message: 'Text liked successfully' });
-  
-      client.release();
-  
+        console.log("here4")
+        res.status(200).json({ success: true, message: 'Text liked successfully' });
   };
   
+
   const createComment = async (req, res) => {
     const textId = req.params.text_id;
     const { comment, userId } = req.body; // Assuming you have userId in the request body

@@ -2,9 +2,10 @@ import express from "express"
 const router = express.Router()
 import multiMediaController from "../controllers/multiMediaController.js"
 import { trycatchHandler } from "../utils/trycatchHandler.js"
+import { authenticateUser } from "../middleware/authorization.js"
 
 
-router.post("/texts", trycatchHandler(multiMediaController.createText))
+router.post("/texts",authenticateUser,trycatchHandler(multiMediaController.createText))
 router.post("/chat/create-room",trycatchHandler(multiMediaController.createChatRoom))
 router.get("/chat/rooms",trycatchHandler(multiMediaController.getChatRoom))
 router.post("/content/upload/video",trycatchHandler(multiMediaController.createVideo))
@@ -12,7 +13,7 @@ router.post("/content/upload/audio",trycatchHandler(multiMediaController.createA
 router.get("/content/aggregator",trycatchHandler(multiMediaController.displayImage))
 router.post("/chat/rooms/:room_id/messages",trycatchHandler(multiMediaController.shareChatRoomMessage))
 router.get("/texts/:text_id",trycatchHandler(multiMediaController.getTextId))
-router.post("/texts/:text_id/likes",trycatchHandler(multiMediaController.createLikeText))
+router.post("/texts/:text_id/likes",authenticateUser,trycatchHandler(multiMediaController.createLikeText))
 router.post("/texts/:text_id/comments",trycatchHandler(multiMediaController.createComment))
 router.post("/texts/:text_id/user-mentions",trycatchHandler(multiMediaController.createUserComment))
 router.post("/texts/:text_id/emoji-gif",trycatchHandler(multiMediaController.createEmoji))
