@@ -70,25 +70,21 @@ const createText = async (req, res) => {
 
   const createComment = async (req, res) => {
     const textId = req.params.text_id;
-    const { comment, userId } = req.body; // Assuming you have userId in the request body
+    const userId = req.user.id
+    const { comment} = req.body; 
       const client = await pool.connect();
-  
       // Check if the text exists
       const textQuery = 'SELECT * FROM texts WHERE text_id = $1';
       const textResult = await client.query(textQuery, [textId]);
-  
       if (textResult.rows.length === 0) {
         res.status(404).json({ error: 'Text not found' });
         client.release();
         return;
       }
-  
       // Insert the comment into the comments table
-      const insertCommentQuery = 'INSERT INTO comments (text_id, user_id, comment) VALUES ($1, $2, $3)';
+      const insertCommentQuery = 'INSERT INTO comments (text_id, user_id, comment_text) VALUES ($1, $2, $3)';
       await client.query(insertCommentQuery, [textId, userId, comment]);
-  
       res.status(201).json({ message: 'Comment added successfully' });
-  
       client.release();
   };
 
@@ -96,34 +92,27 @@ const createText = async (req, res) => {
 
   const createUserComment = async (req, res) => {
     const textId = req.params.text_id;
-    const { comment, mentionedUserIds } = req.body; // Assuming mentionedUserIds is an array of user IDs
-
+    const { comment, mentionedUserIds } = req.body; 
       const client = await pool.connect();
-  
       // Check if the text exists
       const textQuery = 'SELECT * FROM texts WHERE text_id = $1';
       const textResult = await client.query(textQuery, [textId]);
-  
       if (textResult.rows.length === 0) {
         res.status(404).json({ error: 'Text not found' });
         client.release();
         return;
       }
-  
       // Insert the comment into the comments table
       const insertCommentQuery = 'INSERT INTO comments (text_id, comment) VALUES ($1, $2) RETURNING comment_id';
       const commentResult = await client.query(insertCommentQuery, [textId, comment]);
       const commentId = commentResult.rows[0].comment_id;
-  
       // Insert user mentions into the mentions table
       if (mentionedUserIds && mentionedUserIds.length > 0) {
         const insertMentionsQuery = 'INSERT INTO mentions (comment_id, user_id) VALUES ';
         const values = mentionedUserIds.map(userId => `(${commentId}, ${userId})`).join(', ');
         await client.query(`${insertMentionsQuery}${values}`);
       }
-  
       res.status(201).json({ message: 'Comment with user mentions added successfully' });
-  
       client.release();
   };
   
@@ -131,27 +120,20 @@ const createText = async (req, res) => {
   const createEmoji =  async (req, res) => {
     const textId = req.params.text_id;
     const { content } = req.body; // Assuming content contains emojis and GIFs
-
       const client = await pool.connect();
-  
       // Check if the text exists
       const textQuery = 'SELECT * FROM texts WHERE text_id = $1';
       const textResult = await client.query(textQuery, [textId]);
-  
       if (textResult.rows.length === 0) {
         res.status(404).json({ error: 'Text not found' });
         client.release();
         return;
       }
-  
       // Update the content with emojis and GIFs
       const updateContentQuery = 'UPDATE texts SET content = $1 WHERE text_id = $2';
       await client.query(updateContentQuery, [content, textId]);
-  
       res.status(200).json({ message: 'Emojis and GIFs updated successfully' });
-  
       client.release();
-   
   };
   
 
