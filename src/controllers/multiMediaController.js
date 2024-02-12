@@ -103,10 +103,11 @@ const createText = async (req, res) => {
         return;
       }
       // Insert the comment into the comments table
-      const insertCommentQuery = 'INSERT INTO comments (text_id, comment) VALUES ($1, $2) RETURNING comment_id';
+      const insertCommentQuery = 'INSERT INTO comments (text_id, comment_text) VALUES ($1, $2) RETURNING comment_id';
       const commentResult = await client.query(insertCommentQuery, [textId, comment]);
       const commentId = commentResult.rows[0].comment_id;
       // Insert user mentions into the mentions table
+      console.log("mentionId",mentionedUserIds)
       if (mentionedUserIds && mentionedUserIds.length > 0) {
         const insertMentionsQuery = 'INSERT INTO mentions (comment_id, user_id) VALUES ';
         const values = mentionedUserIds.map(userId => `(${commentId}, ${userId})`).join(', ');
@@ -119,7 +120,7 @@ const createText = async (req, res) => {
   
   const createEmoji =  async (req, res) => {
     const textId = req.params.text_id;
-    const { content } = req.body; // Assuming content contains emojis and GIFs
+    const { urlink } = req.body; 
       const client = await pool.connect();
       // Check if the text exists
       const textQuery = 'SELECT * FROM texts WHERE text_id = $1';
@@ -129,9 +130,16 @@ const createText = async (req, res) => {
         client.release();
         return;
       }
-      // Update the content with emojis and GIFs
-      const updateContentQuery = 'UPDATE texts SET content = $1 WHERE text_id = $2';
-      await client.query(updateContentQuery, [content, textId]);
+      const emo = await pool.query('SELECT url FROM emoji WHERE text_id = $1',[textId])
+      console.log("emo",emo.rows[0])
+      const emoUrl = emo.rows[0]
+      const {url} = emoUrl
+      if(url.length > 0){
+        await pool.query('UPDATE emoji SET url = $1 WHERE text_id = $2 RETURNING *',[url,textId])
+      }else{
+         // Update the content with emojis and GIFs
+        await pool.query('INSERT INTO emoji (url,text_id) VALUES ($1,$2) RETURNING *',[urlink, textId]);
+      }
       res.status(200).json({ message: 'Emojis and GIFs updated successfully' });
       client.release();
   };
@@ -139,20 +147,16 @@ const createText = async (req, res) => {
 
   const createReport  =  async (req, res) => {
     const textId = req.params.text_id;
-    const { reason, reporterUserId } = req.body; // Assuming you have a reason for reporting and the user ID of the reporter
-  
+    const { reason, reporterUserId } = req.body; 
       const client = await pool.connect();
-  
       // Check if the text exists
       const textQuery = 'SELECT * FROM texts WHERE text_id = $1';
       const textResult = await client.query(textQuery, [textId]);
-  
       if (textResult.rows.length === 0) {
         res.status(404).json({ error: 'Text not found' });
         client.release();
         return;
       }
-  
       // Insert the report into the reports table
       const insertReportQuery = 'INSERT INTO reports (text_id, reporter_user_id, reason) VALUES ($1, $2, $3)';
       await client.query(insertReportQuery, [textId, reporterUserId, reason]);
@@ -163,7 +167,7 @@ const createText = async (req, res) => {
   };
   
  const createChatRoom = async (req, res) => {
-    const { roomName, createdBy } = req.body; // Assuming you have roomName and createdBy in the request body
+    const { roomName, createdBy } = req.body; 
   
       const client = await pool.connect();
   

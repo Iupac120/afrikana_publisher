@@ -15,7 +15,7 @@ router.post("/chat/rooms/:room_id/messages",trycatchHandler(multiMediaController
 router.get("/texts/:text_id",trycatchHandler(multiMediaController.getTextId))
 router.post("/texts/:text_id/likes",authenticateUser,trycatchHandler(multiMediaController.createLikeText))
 router.post("/texts/:text_id/comments",authenticateUser,trycatchHandler(multiMediaController.createComment))
-router.post("/texts/:text_id/user-mentions",trycatchHandler(multiMediaController.createUserComment))
+router.post("/texts/:text_id/user-mentions",authenticateUser,trycatchHandler(multiMediaController.createUserComment))
 router.post("/texts/:text_id/emoji-gif",trycatchHandler(multiMediaController.createEmoji))
 router.post("/texts/:text_id/report",trycatchHandler(multiMediaController.createReport))
 router.get("/content/:content_id",trycatchHandler(multiMediaController.createContent))

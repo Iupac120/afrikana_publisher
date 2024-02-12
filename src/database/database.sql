@@ -271,14 +271,14 @@ CREATE TABLE comments (
 );
 
 -- User Mentions Table
-CREATE TABLE user_mentions (
+CREATE TABLE mentions (
     mention_id SERIAL PRIMARY KEY,
     comment_id INTEGER REFERENCES comments(comment_id),
-    mentioned_user_id INTEGER REFERENCES users(user_id)
+    user_id INTEGER REFERENCES users(user_id)
 );
 
 -- Emoji-GIF Table
-CREATE TABLE emoji_gif (
+CREATE TABLE emoji (
     emoji_gif_id SERIAL PRIMARY KEY,
     text_id INTEGER REFERENCES texts(text_id),
     url TEXT NOT NULL
