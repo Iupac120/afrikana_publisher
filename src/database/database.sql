@@ -289,7 +289,7 @@ CREATE TABLE reports (
     report_id SERIAL PRIMARY KEY,
     text_id INTEGER REFERENCES texts(text_id),
     user_id INTEGER REFERENCES users(user_id),
-    report_reason TEXT NOT NULL,
+    reason TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

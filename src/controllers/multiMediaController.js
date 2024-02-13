@@ -147,7 +147,8 @@ const createText = async (req, res) => {
 
   const createReport  =  async (req, res) => {
     const textId = req.params.text_id;
-    const { reason, reporterUserId } = req.body; 
+    const reporterUserId = req.user.id
+    const { reason } = req.body; 
       const client = await pool.connect();
       // Check if the text exists
       const textQuery = 'SELECT * FROM texts WHERE text_id = $1';
@@ -158,55 +159,43 @@ const createText = async (req, res) => {
         return;
       }
       // Insert the report into the reports table
-      const insertReportQuery = 'INSERT INTO reports (text_id, reporter_user_id, reason) VALUES ($1, $2, $3)';
+      const insertReportQuery = 'INSERT INTO reports (text_id, user_id, reason) VALUES ($1, $2, $3)';
       await client.query(insertReportQuery, [textId, reporterUserId, reason]);
-  
       res.status(201).json({ message: 'Text reported successfully' });
-  
       client.release();
   };
   
  const createChatRoom = async (req, res) => {
-    const { roomName, createdBy } = req.body; 
-  
+  const createdBy = req.user.id
+    const { roomName } = req.body; 
       const client = await pool.connect();
-  
       // Check if the room name already exists
       const checkRoomQuery = 'SELECT * FROM chat_rooms WHERE room_name = $1';
       const checkRoomResult = await client.query(checkRoomQuery, [roomName]);
-  
       if (checkRoomResult.rows.length > 0) {
         res.status(400).json({ error: 'Room name already exists' });
         client.release();
         return;
       }
-  
       // Insert the new chat room into the chat_rooms table
       const insertRoomQuery = 'INSERT INTO chat_rooms (room_name, created_by) VALUES ($1, $2)';
       await client.query(insertRoomQuery, [roomName, createdBy]);
-  
       res.status(201).json({ message: 'Chat room created successfully' });
-  
       client.release();
-   
   };
   
 
 
   const getChatRoom =  async (req, res) => {
-    
+    const user = req.user.id
       const client = await pool.connect();
-  
       // Retrieve the list of chat rooms
       const roomsQuery = 'SELECT * FROM chat_rooms';
       const roomsResult = await client.query(roomsQuery);
-  
       // Extract the rows from the result
       const rooms = roomsResult.rows;
-  
       // Send the list of chat rooms as the response
       res.status(200).json(rooms);
-  
       client.release();
   };
 

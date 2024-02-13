@@ -6,8 +6,8 @@ import { authenticateUser } from "../middleware/authorization.js"
 
 
 router.post("/texts",authenticateUser,trycatchHandler(multiMediaController.createText))
-router.post("/chat/create-room",trycatchHandler(multiMediaController.createChatRoom))
-router.get("/chat/rooms",trycatchHandler(multiMediaController.getChatRoom))
+router.post("/chat/create-room",authenticateUser,trycatchHandler(multiMediaController.createChatRoom))
+router.get("/chat/rooms",authenticateUser,trycatchHandler(multiMediaController.getChatRoom))
 router.post("/content/upload/video",trycatchHandler(multiMediaController.createVideo))
 router.post("/content/upload/audio",trycatchHandler(multiMediaController.createAudio))
 router.get("/content/aggregator",trycatchHandler(multiMediaController.displayImage))
@@ -17,7 +17,7 @@ router.post("/texts/:text_id/likes",authenticateUser,trycatchHandler(multiMediaC
 router.post("/texts/:text_id/comments",authenticateUser,trycatchHandler(multiMediaController.createComment))
 router.post("/texts/:text_id/user-mentions",authenticateUser,trycatchHandler(multiMediaController.createUserComment))
 router.post("/texts/:text_id/emoji-gif",trycatchHandler(multiMediaController.createEmoji))
-router.post("/texts/:text_id/report",trycatchHandler(multiMediaController.createReport))
+router.post("/texts/:text_id/report",authenticateUser,trycatchHandler(multiMediaController.createReport))
 router.get("/content/:content_id",trycatchHandler(multiMediaController.createContent))
 router.get("/content/sort",trycatchHandler(multiMediaController.sortContent))
 router.get("/content/display/slideshow",trycatchHandler(multiMediaController.displayContentSlideshow))
