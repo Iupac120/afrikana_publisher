@@ -1,5 +1,6 @@
 import pool from "../database/db.js";
 import { NotFoundError } from "../errors/customError.js";
+import cloudinary from "../utils/cloudinary.js";
 
 const createText = async (req, res) => {
     const { content, formatting } = req.body;
@@ -220,107 +221,85 @@ const createText = async (req, res) => {
   };
   
   const createVideo = async (req, res) => {
-    // Assuming you're using multer or another middleware for handling file uploads
-    // and that the uploaded file is available in req.file
-    // Extract file details from the request
-    const { originalname, mimetype, size } = req.file;
-    // Perform file type and quality validation
-    if (mimetype !== 'video/mp4') {
-      return res.status(400).json({ error: 'Only MP4 videos are supported' });
-    }
-    // You can add additional quality validation logic here if needed
-      const client = await pool.connect();
-      // Store the video details in the database
-      const insertVideoQuery = 'INSERT INTO videos (file_name, file_type, file_size) VALUES ($1, $2, $3)';
-      await client.query(insertVideoQuery, [originalname, mimetype, size]);
-      res.status(201).json({ message: 'Video uploaded successfully' });
-      client.release();
+    cloudinary.uploader.upload(req.file.path, function (err,result) {
+      if(err){
+        console.log(err)
+        return res.status(500).json({
+          success:false,
+          message:"false"
+        })
+      }
+      res.staus(200).json({
+        success: true,
+        message:"uploaded",
+        data:result
+      })
+    })
+  
+      // const client = await pool.connect();
+      // const insertVideoQuery = 'INSERT INTO videos (file_name, file_type, file_size) VALUES ($1, $2, $3)';
+      // await client.query(insertVideoQuery, [originalname, mimetype, size]);
+      // res.status(201).json({ message: 'Video uploaded successfully' });
+      // client.release();
   };
   
   const createAudio =  async (req, res) => {
     // Assuming you're using multer or another middleware for handling file uploads
     // and that the uploaded file is available in req.file
-  
     // Extract file details from the request
     const { originalname, mimetype, size } = req.file;
-  
     // Perform file type validation
     if (mimetype !== 'audio/mpeg' && mimetype !== 'audio/mp3') {
       return res.status(400).json({ error: 'Only MP3 audio files are supported' });
     }
-  
-    
       const client = await pool.connect();
-  
       // Store the audio details in the database
       const insertAudioQuery = 'INSERT INTO audios (file_name, file_type, file_size) VALUES ($1, $2, $3)';
       await client.query(insertAudioQuery, [originalname, mimetype, size]);
-  
       res.status(201).json({ message: 'Audio uploaded successfully' });
-  
       client.release();
-   
   };
   
+
   const createContent =  async (req, res) => {
     const contentId = req.params.content_id;
-  
-    
       const client = await pool.connect();
-  
       // Retrieve specific content by ID from the database
       const query = 'SELECT * FROM content WHERE content_id = $1';
       const result = await client.query(query, [contentId]);
-  
       // Check if content with the provided ID exists
       if (result.rows.length === 0) {
         return res.status(404).json({ error: 'Content not found' });
       }
-  
       const content = result.rows[0];
-  
       // Send the content as the response
       res.status(200).json(content);
-  
       client.release();
-   
   };
 
   const displayImage = async (req, res) => {
     const { tags } = req.query; // Assuming tags are provided as query parameters
-  
-
       const client = await pool.connect();
-  
       // Build the query dynamically based on the provided tags
       let query = 'SELECT * FROM images';
       const values = [];
-  
       if (tags) {
         const tagArray = tags.split(',');
         const placeholders = tagArray.map((tag, index) => `$${index + 1}`).join(',');
         query += ` WHERE tags && ARRAY[${placeholders}]`;
         values.push(...tagArray);
       }
-  
       // Execute the query to retrieve images based on tags
       const result = await client.query(query, values);
-  
       // Send the retrieved images as the response
       res.status(200).json(result.rows);
-  
       client.release();
-  
   };
   
   const sortContent =  async (req, res) => {
     const { sortBy } = req.query; // Assuming sortBy is provided as a query parameter
-  
-
       const client = await pool.connect();
-  
       let query = 'SELECT * FROM content';
-  
       // Dynamically adjust the query based on the sortBy parameter
       if (sortBy === 'upload_time') {
         query += ' ORDER BY upload_time DESC'; // Sorting by upload time in descending order
@@ -330,32 +309,23 @@ const createText = async (req, res) => {
         // Default to sorting by upload time if sortBy parameter is not provided or invalid
         query += ' ORDER BY upload_time DESC';
       }
-  
       // Execute the query to retrieve sorted content
       const result = await client.query(query);
-  
       // Send the sorted content as the response
       res.status(200).json(result.rows);
-  
       client.release();
-  
   };
   
   const displayContentSlideshow = async (req, res) => {
       const client = await pool.connect();
-  
       // Retrieve content from the database (assuming you have a content table)
       const query = 'SELECT * FROM content';
       const result = await client.query(query);
-  
       // Assuming result.rows is an array of content objects
       const content = result.rows;
-  
       // Your logic for organizing content into a slideshow format goes here
-  
       // For simplicity, let's assume we send the content as-is for now
       res.status(200).json(content);
-  
       client.release();
    
   };
@@ -363,35 +333,25 @@ const createText = async (req, res) => {
 
   const displayCarousel =  async (req, res) => {
       const client = await pool.connect();
-  
       // Retrieve content from the database (assuming you have a content table)
       const query = 'SELECT * FROM content';
       const result = await client.query(query);
-  
       // Assuming result.rows is an array of content objects
       const content = result.rows;
-  
       // Your logic for organizing content into a carousel format goes here
-  
       // For simplicity, let's assume we send the content as-is for now
       res.status(200).json(content);
-  
       client.release();
-   
   };
   
 
   const createRecommendation =  async (req, res) => {
-    
       // Assuming you have user information available in req.body or req.user
       const { userId } = req.body;
-  
       const client = await pool.connect();
-  
       // Your recommendation logic goes here
       // For example, you might retrieve user preferences or behavior from the database
       // Then, you can use that information to query for relevant content
-  
       const recommendationsQuery = `
         SELECT * 
         FROM content 
