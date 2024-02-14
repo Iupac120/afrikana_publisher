@@ -11,7 +11,7 @@ router.get("/chat/rooms",authenticateUser,trycatchHandler(multiMediaController.g
 router.post("/content/upload/video",trycatchHandler(multiMediaController.createVideo))
 router.post("/content/upload/audio",trycatchHandler(multiMediaController.createAudio))
 router.get("/content/aggregator",trycatchHandler(multiMediaController.displayImage))
-router.post("/chat/rooms/:room_id/messages",trycatchHandler(multiMediaController.shareChatRoomMessage))
+router.post("/chat/rooms/:room_id/messages",authenticateUser,trycatchHandler(multiMediaController.shareChatRoomMessage))
 router.get("/texts/:text_id",trycatchHandler(multiMediaController.getTextId))
 router.post("/texts/:text_id/likes",authenticateUser,trycatchHandler(multiMediaController.createLikeText))
 router.post("/texts/:text_id/comments",authenticateUser,trycatchHandler(multiMediaController.createComment))

@@ -201,55 +201,40 @@ const createText = async (req, res) => {
 
   const shareChatRoomMessage = async (req, res) => {
     const roomId = req.params.room_id;
-    const { senderId, message } = req.body; // Assuming you have senderId and message in the request body
-  
-
+    const senderId = req.user.id
+    const { message } = req.body; // Assuming you have senderId and message in the request body
       const client = await pool.connect();
-  
       // Check if the chat room exists
       const roomQuery = 'SELECT * FROM chat_rooms WHERE room_id = $1';
       const roomResult = await client.query(roomQuery, [roomId]);
-  
       if (roomResult.rows.length === 0) {
         res.status(404).json({ error: 'Chat room not found' });
         client.release();
         return;
       }
-  
       // Insert the message into the messages table
-      const insertMessageQuery = 'INSERT INTO messages (room_id, sender_id, message_text) VALUES ($1, $2, $3)';
+      const insertMessageQuery = 'INSERT INTO messages (room_id, user_id, message_text) VALUES ($1, $2, $3)';
       await client.query(insertMessageQuery, [roomId, senderId, message]);
-  
       res.status(201).json({ message: 'Message sent successfully' });
-  
       client.release();
-  
   };
   
   const createVideo = async (req, res) => {
     // Assuming you're using multer or another middleware for handling file uploads
     // and that the uploaded file is available in req.file
-  
     // Extract file details from the request
     const { originalname, mimetype, size } = req.file;
-  
     // Perform file type and quality validation
     if (mimetype !== 'video/mp4') {
       return res.status(400).json({ error: 'Only MP4 videos are supported' });
     }
-  
     // You can add additional quality validation logic here if needed
-  
       const client = await pool.connect();
-  
       // Store the video details in the database
       const insertVideoQuery = 'INSERT INTO videos (file_name, file_type, file_size) VALUES ($1, $2, $3)';
       await client.query(insertVideoQuery, [originalname, mimetype, size]);
-  
       res.status(201).json({ message: 'Video uploaded successfully' });
-  
       client.release();
-    
   };
   
   const createAudio =  async (req, res) => {
