@@ -19,7 +19,7 @@ router.post("/texts/:text_id/comments",authenticateUser,trycatchHandler(multiMed
 router.post("/texts/:text_id/user-mentions",authenticateUser,trycatchHandler(multiMediaController.createUserComment))
 router.post("/texts/:text_id/emoji-gif",trycatchHandler(multiMediaController.createEmoji))
 router.post("/texts/:text_id/report",authenticateUser,trycatchHandler(multiMediaController.createReport))
-router.get("/content/:content_id",trycatchHandler(multiMediaController.createContent))
+router.get("/content/:content_id",trycatchHandler(multiMediaController.getContent))
 router.get("/content/sort",trycatchHandler(multiMediaController.sortContent))
 router.get("/content/display/slideshow",trycatchHandler(multiMediaController.displayContentSlideshow))
 router.get("/content/display/carousel",trycatchHandler(multiMediaController.displayCarousel))

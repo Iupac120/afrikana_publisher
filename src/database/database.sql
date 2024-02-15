@@ -310,13 +310,17 @@ CREATE TABLE messages (
     sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Content Table
+-- video table
 CREATE TABLE content (
-    content_id SERIAL PRIMARY KEY,
-    type VARCHAR(50) NOT NULL,
-    file_path TEXT NOT NULL,
+    video_id SERIAL PRIMARY KEY,
+    file_name TEXT NOT NULL,
+    cloudinary_url TEXT NOT NULL,
+    public_id VARCHAR(50) NOT NULL,
+    file_desc VARCHAR(50) NOT NULL,
     upload_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+
 
 -- Recommendations Table
 CREATE TABLE recommendations (

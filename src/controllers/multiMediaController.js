@@ -221,7 +221,8 @@ const createText = async (req, res) => {
   };
   
   const createVideo = async (req, res) => {
-    cloudinary.uploader.upload(req.file.path, function (err,result) {
+    const {description} = req.body
+    await cloudinary.uploader.upload(req.file.path,{resource_type:"video"}, async function (err,result) {
       if(err){
         console.log(err)
         return res.status(500).json({
@@ -229,39 +230,39 @@ const createText = async (req, res) => {
           message:"false"
         })
       }
-      res.staus(200).json({
+      const {url,public_id} = result
+      await pool.query('INSERT INTO content (file_name, cloudinary_url, public_id,file_desc) VALUES ($1, $2, $3, $4) RETURNING *',[req.file.originalname,url,public_id,description]);
+      res.status(200).json({
         success: true,
         message:"uploaded",
         data:result
       })
     })
   
-      // const client = await pool.connect();
-      // const insertVideoQuery = 'INSERT INTO videos (file_name, file_type, file_size) VALUES ($1, $2, $3)';
-      // await client.query(insertVideoQuery, [originalname, mimetype, size]);
-      // res.status(201).json({ message: 'Video uploaded successfully' });
-      // client.release();
   };
   
   const createAudio =  async (req, res) => {
-    // Assuming you're using multer or another middleware for handling file uploads
-    // and that the uploaded file is available in req.file
-    // Extract file details from the request
-    const { originalname, mimetype, size } = req.file;
-    // Perform file type validation
-    if (mimetype !== 'audio/mpeg' && mimetype !== 'audio/mp3') {
-      return res.status(400).json({ error: 'Only MP3 audio files are supported' });
-    }
-      const client = await pool.connect();
-      // Store the audio details in the database
-      const insertAudioQuery = 'INSERT INTO audios (file_name, file_type, file_size) VALUES ($1, $2, $3)';
-      await client.query(insertAudioQuery, [originalname, mimetype, size]);
-      res.status(201).json({ message: 'Audio uploaded successfully' });
-      client.release();
+    const {description} = req.body
+    await cloudinary.uploader.upload(req.file.path,{resource_type:"video"}, async function (err,result) {
+      if(err){
+        console.log(err)
+        return res.status(500).json({
+          success:false,
+          message:"false"
+        })
+      }
+      const {url,public_id} = result
+       pool.query('INSERT INTO content (file_name, cloudinary_url, public_id,file_desc) VALUES ($1, $2, $3, $4) RETURNING *',[req.file.originalname,url,public_id,description]);
+      res.status(200).json({
+        success: true,
+        message:"uploaded",
+        data:result
+      })
+    })
   };
   
 
-  const createContent =  async (req, res) => {
+  const getContent =  async (req, res) => {
     const contentId = req.params.content_id;
       const client = await pool.connect();
       // Retrieve specific content by ID from the database
@@ -278,7 +279,7 @@ const createText = async (req, res) => {
   };
 
   const displayImage = async (req, res) => {
-    const { tags } = req.query; // Assuming tags are provided as query parameters
+    const { tags } = req.query; 
       const client = await pool.connect();
       // Build the query dynamically based on the provided tags
       let query = 'SELECT * FROM images';
@@ -297,9 +298,11 @@ const createText = async (req, res) => {
   };
   
   const sortContent =  async (req, res) => {
-    const { sortBy } = req.query; // Assuming sortBy is provided as a query parameter
+    console.log('here')
+    const { sortBy } = req.query; 
       const client = await pool.connect();
       let query = 'SELECT * FROM content';
+      console.log("query",query)
       // Dynamically adjust the query based on the sortBy parameter
       if (sortBy === 'upload_time') {
         query += ' ORDER BY upload_time DESC'; // Sorting by upload time in descending order
@@ -437,7 +440,7 @@ const createText = async (req, res) => {
     shareChatRoomMessage,
     createVideo,
     createAudio,
-    createContent,
+    getContent,
     displayImage,
     sortContent,
     displayContentSlideshow,

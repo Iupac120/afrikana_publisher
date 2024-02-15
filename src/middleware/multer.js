@@ -11,6 +11,14 @@ const storage = multer.diskStorage({
     filename: function(req,file,cb){
         cb(null, Date.now() + file.originalname)
         console.log("fileName",Date.now()+file.originalname)
+    },
+    fileFilter: function(req,file,cb){
+        let ext = path.extname(file.originalname);
+        if(ext !== ".mp4" && ext !== ".mkv" && ext !== ".mp3" && ext !== ".jpeg" && ext !== ".jpg" && ext !== ".png"){
+            cb(new Error("file type is not supported"),false);
+            return
+        }
+        cb(null, true)
     }
 })
 
