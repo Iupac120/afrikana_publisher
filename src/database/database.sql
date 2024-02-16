@@ -331,11 +331,12 @@ CREATE TABLE recommendations (
 );
 
 -- Shares Table
-CREATE TABLE shares (
+CREATE TABLE shared_content (
     share_id SERIAL PRIMARY KEY,
     content_id INTEGER REFERENCES content(content_id),
-    sharer_id INTEGER REFERENCES users(user_id),
+    user_id INTEGER REFERENCES users(user_id),
     referral_link TEXT NOT NULL,
+    bookmarked BOOLEAN,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

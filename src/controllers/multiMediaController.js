@@ -263,6 +263,7 @@ const createText = async (req, res) => {
   
 
   const getContent =  async (req, res) => {
+    console.log("here get content")
     const contentId = req.params.content_id;
       const client = await pool.connect();
       // Retrieve specific content by ID from the database
@@ -305,9 +306,9 @@ const createText = async (req, res) => {
       console.log("query",query)
       // Dynamically adjust the query based on the sortBy parameter
       if (sortBy === 'upload_time') {
-        query += ' ORDER BY upload_time DESC'; // Sorting by upload time in descending order
+        query += ' ORDER BY upload_time DESC'; 
       } else if (sortBy === 'popularity') {
-        query += ' ORDER BY popularity DESC'; // Sorting by popularity in descending order
+        query += ' ORDER BY popularity DESC'; 
       } else {
         // Default to sorting by upload time if sortBy parameter is not provided or invalid
         query += ' ORDER BY upload_time DESC';
@@ -378,54 +379,90 @@ const createText = async (req, res) => {
   
 
   const createContentLink =  async (req, res) => {
-      // Assuming you have content information available in req.body
-      const { contentId, userId } = req.body;
-  
+      // Assuming you have content information available in req.
+      const userId = req.user.id
+      const { contentId }= req.params;
       // Generate a unique referral link (you can use UUID or any other unique identifier)
       const referralLink = generateReferralLink();
-  
+      console.log("link",referralLink)
       // Store the shared content and referral link in the database
       const client = await pool.connect();
-  
       const insertShareQuery = `
         INSERT INTO shared_content (content_id, user_id, referral_link, bookmarked)
         VALUES ($1, $2, $3, false)
       `;
       await client.query(insertShareQuery, [contentId, userId, referralLink]);
-  
       // Send the referral link as the response
       res.status(201).json({ referralLink });
-  
       client.release();
-   
   };
-  
   // Function to generate a unique referral link (for example)
   function generateReferralLink() {
     // Generate a random string or use UUID
-    return 'http://example.com/referral/' + Math.random().toString(36).substring(2, 15);
+    return 'http://e-publisher.com/referral/' + Math.random().toString(36).substring(2, 15);
   }
   
 
   const contentCategorization = async (req, res) => {
       // Assuming you have content and category information available in req.body
       const { contentId, categoryId, subCategoryId } = req.body;
-  
       // Store the categorization information in the database
       const client = await pool.connect();
-  
       const insertCategorizationQuery = `
         INSERT INTO content_categorization (content_id, category_id, sub_category_id)
         VALUES ($1, $2, $3)
       `;
       await client.query(insertCategorizationQuery, [contentId, categoryId, subCategoryId]);
-  
       res.status(201).json({ message: 'Content categorized successfully' });
-  
       client.release();
-   
   };
+
+
+    
+  const createImage = async (req, res) => {
+    const {description} = req.body
+    await cloudinary.uploader.upload(req.file.path,{resource_type:"image"}, async function (err,result) {
+      if(err){
+        console.log(err)
+        return res.status(500).json({
+          success:false,
+          message:"false"
+        })
+      }
+      const {url,public_id} = result
+      await pool.query('INSERT INTO content (file_name, cloudinary_url, public_id,file_desc) VALUES ($1, $2, $3, $4) RETURNING *',[req.file.originalname,url,public_id,description]);
+      res.status(200).json({
+        success: true,
+        message:"uploaded",
+        data:result
+      })
+    })
   
+  };
+  const getAllImage = async (req,res) => {
+    const { imageId } = req.params;
+    const { rows } = await pool.query("SELECT * FROM your_table_name" +
+    "WHERE your_column_name LIKE '%.jpeg'" +
+       "OR your_column_name LIKE '%.jpg'" +
+       "OR your_column_name LIKE '%.png'"
+    );
+    if (rows.length === 0) {
+      res.status(404).json({ success: false, message: 'Image analysis results not found' });
+    } else {
+      const imageAnalysis = rows[0];
+      res.status(200).json({ success: true, imageAnalysis });
+    }
+  }
+  const getImage = async (req,res) => {
+    const { imageId } = req.params;
+    const { rows } = await pool.query('SELECT * FROM content WHERE content_id = $1', [imageId]);
+    if (rows.length === 0) {
+      res.status(404).json({ success: false, message: 'Image analysis results not found' });
+    } else {
+      const imageAnalysis = rows[0];
+      res.status(200).json({ success: true, imageAnalysis });
+    }
+  }
 
   export default {
     createText,
@@ -447,5 +484,8 @@ const createText = async (req, res) => {
     displayCarousel,
     createRecommendation,
     createContentLink,
-    contentCategorization
+    contentCategorization,
+    createImage,
+    getAllImage,
+    getImage
 }
