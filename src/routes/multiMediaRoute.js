@@ -11,7 +11,7 @@ router.post("/chat/create-room",authenticateUser,trycatchHandler(multiMediaContr
 router.get("/chat/rooms",authenticateUser,trycatchHandler(multiMediaController.getChatRoom))
 router.post("/content/upload/video",upload.single('video'),trycatchHandler(multiMediaController.createVideo))
 router.post("/content/upload/audio",upload.single('audio'),trycatchHandler(multiMediaController.createAudio))
-router.post("/iaa/upload-image",upload.single('image'),trycatchHandler(multiMediaController.createAudio))
+router.post("/iaa/upload-image",upload.single('image'),trycatchHandler(multiMediaController.createImage))
 router.get("/iaa/image",trycatchHandler(multiMediaController.getAllImage))
 router.get("/content/aggregator",trycatchHandler(multiMediaController.displayImage))
 router.get("/content/sort",trycatchHandler(multiMediaController.sortContent))
@@ -28,6 +28,6 @@ router.post("/texts/:text_id/emoji-gif",trycatchHandler(multiMediaController.cre
 router.post("/texts/:text_id/report",authenticateUser,trycatchHandler(multiMediaController.createReport))
 router.get("/content/:content_id",trycatchHandler(multiMediaController.getContent))
 router.post("/content/:contendId/share",authenticateUser,trycatchHandler(multiMediaController.createContentLink))
-router.post("/iaa/analyze-image/:image_id",authenticateUser,trycatchHandler(multiMediaController.getImage))
+router.get("/iaa/analyze-image/:imageId",trycatchHandler(multiMediaController.getImage))
 
 export {router}

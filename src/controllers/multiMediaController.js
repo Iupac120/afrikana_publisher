@@ -421,9 +421,12 @@ const createText = async (req, res) => {
     
   const createImage = async (req, res) => {
     const {description} = req.body
-    await cloudinary.uploader.upload(req.file.path,{resource_type:"image"}, async function (err,result) {
+    await cloudinary.uploader.upload(req.file.path,{
+      folder:"image",
+      width: 300,
+      crop:"scale"}, async function (err,result) {
       if(err){
-        console.log(err)
+        console.log("this is the err",err)
         return res.status(500).json({
           success:false,
           message:"false"
@@ -436,23 +439,22 @@ const createText = async (req, res) => {
         message:"uploaded",
         data:result
       })
-    })
+    }) 
   
   };
+
+
   const getAllImage = async (req,res) => {
-    const { imageId } = req.params;
-    const { rows } = await pool.query("SELECT * FROM your_table_name" +
-    "WHERE your_column_name LIKE '%.jpeg'" +
-       "OR your_column_name LIKE '%.jpg'" +
-       "OR your_column_name LIKE '%.png'"
-    );
+    const { rows } = await pool.query("SELECT * FROM content WHERE file_name LIKE '%.jpeg' OR file_name LIKE '%.jpg' OR file_name LIKE '%.png'");
     if (rows.length === 0) {
-      res.status(404).json({ success: false, message: 'Image analysis results not found' });
+      res.status(404).json({ success: false, message: 'Images not found' });
     } else {
-      const imageAnalysis = rows[0];
+      const imageAnalysis = rows;
       res.status(200).json({ success: true, imageAnalysis });
     }
   }
+
+  
   const getImage = async (req,res) => {
     const { imageId } = req.params;
     const { rows } = await pool.query('SELECT * FROM content WHERE content_id = $1', [imageId]);
