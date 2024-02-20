@@ -105,7 +105,6 @@ const displayModeToggle = async (req,res) => {
 
 
 //account setting
-
 const updateUserPassword = async (req,res) => {
     const userId = req.user.id
     const userPass = await pool.query("SELECT user_password,user_name FROM users WHERE user_id = $1",[userId])
