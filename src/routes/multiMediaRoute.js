@@ -8,7 +8,7 @@ import upload from "../middleware/multer.js"
 
 router.post("/texts",authenticateUser,trycatchHandler(multiMediaController.createText))
 router.post("/chat/create-room",authenticateUser,trycatchHandler(multiMediaController.createChatRoom))
-router.get("/chat/rooms",authenticateUser,trycatchHandler(multiMediaController.getChatRoom))
+router.get("/chat/rooms",trycatchHandler(multiMediaController.redirectRoom))
 router.post("/content/upload/video",upload.single('video'),trycatchHandler(multiMediaController.createVideo))
 router.post("/content/upload/audio",upload.single('audio'),trycatchHandler(multiMediaController.createAudio))
 router.post("/iaa/upload-image",upload.single('image'),trycatchHandler(multiMediaController.createImage))
@@ -29,5 +29,6 @@ router.post("/texts/:text_id/report",authenticateUser,trycatchHandler(multiMedia
 router.get("/content/:content_id",trycatchHandler(multiMediaController.getContent))
 router.post("/content/:contendId/share",authenticateUser,trycatchHandler(multiMediaController.createContentLink))
 router.get("/iaa/analyze-image/:imageId",trycatchHandler(multiMediaController.getImage))
+router.get("/chat/rooms/:roomId",trycatchHandler(multiMediaController.getChatRoom))
 
 export {router}

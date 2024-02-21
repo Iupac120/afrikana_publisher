@@ -2,6 +2,10 @@ import express from "express"
 import dotenv from "dotenv"
 dotenv.config()
 const app = express()
+import {createServer} from "http";
+import {Server} from "socket.io";
+const httpServer = createServer(app);
+const io = new Server(httpServer,{cors:{origin:'*'}});
 import morgan from "morgan"
 import cookieParser from "cookie-parser"
 import cors from "cors"
@@ -32,6 +36,7 @@ const corsOptions = {
     allowedHeaders: "Content-Type,Authorization"
 };
 app.use(cors(corsOptions))
+app.set('view engine','ejs')
 app.use(express.static('public'))
 app.use(morgan())
 app.use(
@@ -62,6 +67,14 @@ app.use("/api/media",mediaRoute)
 
 app.use(notFound)
 app.use(errorHandler)
+
+io.on('connection', socket => {
+    socket.on('join-room',(roomId,userId) => {
+      console.log(roomId,userId)
+    })
+  })
+
+
 const start = async () => {
     await console.log(pool.options)
     app.listen(port, () => {
