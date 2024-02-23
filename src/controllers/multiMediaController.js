@@ -190,6 +190,7 @@ const createText = async (req, res) => {
 
   const redirectRoom = async (req,res) =>{
     res.redirect(`/${uuidV4()}`)
+    console.log("uudi",uuidV4())
   }
 
 
@@ -210,7 +211,7 @@ const createText = async (req, res) => {
   const shareChatRoomMessage = async (req, res) => {
     const roomId = req.params.room_id;
     const senderId = req.user.id
-    const { message } = req.body; // Assuming you have senderId and message in the request body
+    const { message } = req.body; 
       const client = await pool.connect();
       // Check if the chat room exists
       const roomQuery = 'SELECT * FROM chat_rooms WHERE room_id = $1';

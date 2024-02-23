@@ -1,5 +1,7 @@
 import express from "express"
 import dotenv from "dotenv"
+import { fileURLToPath } from "url"
+import path, {dirname} from "path";
 dotenv.config()
 const app = express()
 import {createServer} from "http";
@@ -14,8 +16,6 @@ import "./src/utils/passport.js"
 import cookieSession from "cookie-session";
 import expressSession from 'express-session';
 import pgSession from "connect-pg-simple";
-import {dirname, join} from "path"
-import { fileURLToPath } from "url"
 import {router as userRoute} from "./src/routes/userRoute.js"
 import {router as authRoute} from "./src/routes/registerRoute.js"
 import {router as productRoute} from "./src/routes/productRoute.js"
@@ -27,7 +27,8 @@ import {router as mediaRoute} from "./src/routes/multiMediaRoute.js"
 import { notFound } from "./src/errors/NotFoundError.js"
 import { errorHandler } from "./src/errors/errorHandler.js"
 import pool from "./src/database/db.js"
-const _dirname  = dirname(fileURLToPath(import.meta.url))
+const __filename = fileURLToPath(import.meta.url)
+const __dirname  = dirname(__filename)
 app.use(express.json())
 const corsOptions = {
     origin: ["http://localhost:3000", `${process.env.LIENT_URL}`], 
@@ -36,8 +37,10 @@ const corsOptions = {
     allowedHeaders: "Content-Type,Authorization"
 };
 app.use(cors(corsOptions))
+app.set('views', path.join(__dirname,'views'))
 app.set('view engine','ejs')
 app.use(express.static('public'))
+console.log('this is path',path.join(__dirname,'views'))
 app.use(morgan())
 app.use(
     expressSession({
@@ -65,8 +68,8 @@ app.use("/api/payment",paymentRoute)
 app.use("/api/order",orderRoute)
 app.use("/api/media",mediaRoute)
 
-app.use(notFound)
-app.use(errorHandler)
+//app.use(notFound)
+//app.use(errorHandler)
 
 io.on('connection', socket => {
     socket.on('join-room',(roomId,userId) => {
