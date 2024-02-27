@@ -29,6 +29,6 @@ router.post("/texts/:text_id/report",authenticateUser,trycatchHandler(multiMedia
 router.get("/content/:content_id",trycatchHandler(multiMediaController.getContent))
 router.post("/content/:contendId/share",authenticateUser,trycatchHandler(multiMediaController.createContentLink))
 router.get("/iaa/analyze-image/:imageId",trycatchHandler(multiMediaController.getImage))
-router.get("/chat/rooms/:roomId",trycatchHandler(multiMediaController.getChatRoom))
+router.get("/chat/rooms/:room",trycatchHandler(multiMediaController.getChatRoom))
 
 export {router}

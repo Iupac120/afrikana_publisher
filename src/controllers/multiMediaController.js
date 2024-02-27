@@ -190,22 +190,24 @@ const createText = async (req, res) => {
 
   const redirectRoom = async (req,res) =>{
     res.redirect(`/${uuidV4()}`)
+    const room = uuidV4()
     console.log("uudi",uuidV4())
+    await getChatRoom({params:{room}})
   }
 
 
   const getChatRoom =  async (req, res) => {
-    const user = req.user.id
-    const roomId = req.params.roomId
+    //const user = req.user.id
+    //const roomId = req.params.roomId
       const client = await pool.connect();
       // Retrieve the list of chat rooms
-      const roomsQuery = 'SELECT * FROM chat_rooms WHERE room_id = $1';
-      const roomsResult = await client.query(roomsQuery,[roomId]);
-      // Extract the rows from the result
-      const rooms = roomsResult.rows;
+      // const roomsQuery = 'SELECT * FROM chat_rooms WHERE room_id = $1';
+      // const roomsResult = await client.query(roomsQuery,[roomId]);
+      // // Extract the rows from the result
+      // const rooms = roomsResult.rows;
       // Send the list of chat rooms as the response
-      res.status(200).json(rooms);
-      client.release();
+      res.render("room",{roomId:req.params.room});
+      //client.release();
   };
 
   const shareChatRoomMessage = async (req, res) => {
