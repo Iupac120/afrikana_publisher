@@ -31,7 +31,7 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname  = dirname(__filename)
 app.use(express.json())
 const corsOptions = {
-    origin: ["http://localhost:3000", `${process.env.LIENT_URL}`], 
+    origin: ["http://localhost:3000", `${process.env.CLIENT_URL}`], 
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', 
     credentials: true,
     allowedHeaders: "Content-Type,Authorization"
